@@ -9,6 +9,22 @@ public class Utilitaries {
 
 
 
+    private static long[] findYear(long seconds) {
+        int lastCompleteYear = 1970;
+
+        while(true) {
+
+            boolean isBisextile = isBisextile(lastCompleteYear);
+
+            long seuilAnnee = isBisextile ? 31622400L : 31536000L;
+            if(seconds < seuilAnnee) {
+                break;
+            }
+            seconds -= seuilAnnee;
+            lastCompleteYear++;
+        }
+        return new long[]{lastCompleteYear,seconds};
+    }
 
 
 
@@ -16,39 +32,41 @@ public class Utilitaries {
     public static String convertLongToDate(long time) {
         long seconds = time / 1000;
 
-       int lastCompleteYear = 1971;
+        long[] infos = findYear(seconds);
 
-     while(true) {
+        int year = (int)infos[0];
 
-      boolean isBisextile = isBisextile(lastCompleteYear);
+        seconds = infos[1];
 
-         long seuilAnnee = isBisextile ? 31622400L : 31536000L;
-         if(seconds < seuilAnnee) {
-             break;
-         }
-         seconds -= seuilAnnee;
-        lastCompleteYear++;
-     }
+        int[] findMonthAndDay = findMonthAndDay(seconds,isBisextile(year));
 
-     int currentYear = lastCompleteYear + 1;
-
-     int daysInCurrentYear = (int) seconds * 60 * 24;
-
-
-     int month = 1;
-     for(int i = 0; i < 12; ++i) {
-         if(i == 1) {
-
-
-             
-         }
-
-
-     }
+        return year + "/" + findMonthAndDay[0] + "/" + findMonthAndDay[1];
     }
 
 
-    private static final int[] JOURS_PAR_MOIS = {
+    private static int[] findMonthAndDay(long seconds,boolean isBisextileYear) {
+
+        int numberOfDays = (int) (seconds / 86400);
+
+        int i;
+        for( i = 0; i < 12; ++i) {
+
+            int currentIndex = i;
+            if(i == 1 && isBisextileYear) {
+                currentIndex = 12;
+            }
+            int daysPerMonth =  DAYS_PER_MONTH[currentIndex];
+            if(numberOfDays >= daysPerMonth ) {
+                numberOfDays -= daysPerMonth;
+
+            }else {
+              break;
+            }
+        }
+        return new int[]{i+1,numberOfDays+1};
+    }
+
+    private static final int[] DAYS_PER_MONTH = {
             31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 29};
 
 
@@ -57,17 +75,6 @@ public class Utilitaries {
     }
 
 
-
-
-
-
-
-    private static long daysToSeconds(int days) {
-        return (long) days * 24 * 60;
-    }
-    private static long secondsToHours(long seconds) {
-        return  seconds / (long)Math.pow(1000,2);
-    }
 
 
 }
