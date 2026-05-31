@@ -15,8 +15,8 @@ public class Player {
     @Column
     private  String timeStart;
 
-
-    private String lastTimeConnected;
+    @Column
+    private long lastTimeConnected;
 
     public Player() {
 
@@ -32,12 +32,14 @@ public class Player {
     @OneToMany
     private List<Building> buildings = new ArrayList<>();
 
-    @Column()
-
+    @Column
     private String passwordHash;
 
 
-    @Column()
-    private double somme ;
+    @Column
+    private double money;
 
+
+    @OneToMany
+    private Investement investement;
 }

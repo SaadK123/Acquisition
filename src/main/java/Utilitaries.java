@@ -1,3 +1,7 @@
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 public class Utilitaries {
 
 
@@ -7,7 +11,10 @@ public class Utilitaries {
     }
 
 
-
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
 
     private static long[] findYear(long seconds) {
         int lastCompleteYear = 1970;
@@ -42,6 +49,8 @@ public class Utilitaries {
 
         return year + "/" + findMonthAndDay[0] + "/" + findMonthAndDay[1];
     }
+
+
 
 
     private static int[] findMonthAndDay(long seconds,boolean isBisextileYear) {
