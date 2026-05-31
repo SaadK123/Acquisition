@@ -4,11 +4,11 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-@Table(name = "ameliorations")
+@Table(name = "upgrades")
 
 @Getter
 @Setter
-public class Amelioration {
+public class Upgrade {
 
 
     @Id

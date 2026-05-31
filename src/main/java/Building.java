@@ -25,14 +25,8 @@ public class Building {
     private Player player;
 
 
-    @ManyToMany
-    @JoinTable(
-     name = "ameliorations_batiments",
-      joinColumns = @JoinColumn(name = "batiment_id"),
-      inverseJoinColumns = @JoinColumn(name = "amelioration_id")
-
-    )
-   private  List<Amelioration> ameliorations = new ArrayList<>();
+    @OneToMany
+   private  List<Upgrade> ameliorations = new ArrayList<>();
 
 
 
