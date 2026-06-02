@@ -3,16 +3,16 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Table(name = "token")
-@Getter
 @Entity
 public class Token {
 
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
 
-
+    @Getter
     @Column(name = "expired_at")
     private long expiredAt;
 
@@ -27,7 +27,9 @@ public class Token {
     }
 
 
-    @OneToOne
+
+
+    @OneToOne(optional = false)
     private Player player;
 
 

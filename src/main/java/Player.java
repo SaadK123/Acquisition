@@ -51,11 +51,11 @@ public class Player {
 
 
     @OneToMany
-    private List<Investement> investement;
+    private List<Investement> investements;
 
 
 
     public PlayerDTO getPlayerInformations() {
-        return new PlayerDTO();
+        return new PlayerDTO(id.toString(),username,money,lastTimeConnected,timeStart,buildings,investements);
     }
 }
