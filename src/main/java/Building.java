@@ -9,11 +9,12 @@ import java.util.UUID;
 @Table(name = "buildings")
 @Getter
 @Setter
+
+@Entity
 public class Building {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
 
     @Column

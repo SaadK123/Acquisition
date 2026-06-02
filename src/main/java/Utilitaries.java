@@ -83,7 +83,5 @@ public class Utilitaries {
         return year % 4 == 0 && year % 100 != 0  || year % 400 == 0;
     }
 
-
-
-
+    public static final long timeToken = 432000000L;
 }
