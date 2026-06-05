@@ -28,8 +28,8 @@ public class ConnectionService {
         return player.getPlayerInformations(null);
     }
 
-
-    private Token findToken(String tokenId) {
+    @Transactional
+    protected Token findToken(String tokenId) {
         Token token;
         try {
             token = entityManager.createQuery("select t from Token t where  t.id = :id",Token.class)
@@ -40,7 +40,7 @@ public class ConnectionService {
         return token;
     }
 
-
+    @Transactional
     public PlayerDTO connectingThroughAuth(String username,String password) {
         Player player;
         try {
@@ -61,7 +61,14 @@ public class ConnectionService {
     }
 
 
-    public void logOutJWT(String tokenId) {
-     
+    @Transactional
+    public void logOut(String tokenId) {
+     Token token = findToken(tokenId);
+
+     entityManager.remove(token);
     }
+
+
+
+    
 }
