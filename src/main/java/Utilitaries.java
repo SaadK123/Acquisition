@@ -2,6 +2,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.crypto.Mac;
+
 public class Utilitaries {
 
 
@@ -75,6 +77,13 @@ public class Utilitaries {
         return new int[]{i+1,numberOfDays+1};
     }
 
+
+    public static long getDeltaTime(long time) {
+     return System.currentTimeMillis() - time;
+    }
+
+
+
     private static final int[] DAYS_PER_MONTH = {
             31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 29};
 
@@ -84,4 +93,15 @@ public class Utilitaries {
     }
 
     public static final long timeToken = 432000000L;
+
+
+    public static  Mac mac;
+
+    static {
+        try {
+         mac = Mac.getInstance("HmacSHA256");
+        }catch (Exception _) {}
+
+
+    }
 }

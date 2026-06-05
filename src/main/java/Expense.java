@@ -5,19 +5,19 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-@Table(name = "upgrades")
+@Table(name = "expenses")
 
 @Getter
 @Setter
 @Entity
-public class Upgrade {
+public class Expense {
 
 
     @Id
-    private String cle;
+    private String key;
 
 
     @Column
-    private double valeur;
+    private double value;
 
 }

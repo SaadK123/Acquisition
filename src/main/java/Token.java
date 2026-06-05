@@ -39,4 +39,9 @@ public class Token {
         }
       return player;
     }
+
+
+    public boolean isTokenValid() {
+        return getPlayerRaw() != null;
+    }
 }

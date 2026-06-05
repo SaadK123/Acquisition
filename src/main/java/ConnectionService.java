@@ -15,10 +15,12 @@ public class ConnectionService {
 
     EntityManager entityManager;
     PasswordEncoder passwordEncoder;
+    TokenService tokenService;
+
 
     @Transactional
     public PlayerDTO connectingThroughJWT(String tokenId) {
-        Token token = findToken(tokenId);
+        Token token = tokenService.findToken(tokenId);
 
         Player player = token.getPlayerRaw();
 
@@ -28,17 +30,7 @@ public class ConnectionService {
         return player.getPlayerInformations(null);
     }
 
-    @Transactional
-    protected Token findToken(String tokenId) {
-        Token token;
-        try {
-            token = entityManager.createQuery("select t from Token t where  t.id = :id",Token.class)
-                    .setParameter("id",tokenId).getSingleResult();
-        }catch (NoResultException _) {
-            throw new AcquisitionException("token has not been found");
-        }
-        return token;
-    }
+
 
     @Transactional
     public PlayerDTO connectingThroughAuth(String username,String password) {
@@ -63,10 +55,10 @@ public class ConnectionService {
 
     @Transactional
     public void logOut(String tokenId) {
-     Token token = findToken(tokenId);
-
+     Token token = tokenService.findToken(tokenId);
      entityManager.remove(token);
     }
+
 
 
 }
