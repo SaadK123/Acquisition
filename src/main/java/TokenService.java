@@ -35,8 +35,12 @@ public class TokenService {
         }
 
         // 3 Verify if the signature is valid with the good secret
+        boolean verifySignature = verifySignature(tokenRaw);
 
-
+        if(!verifySignature){
+            return null;
+        }
+     return token;
     }
 
 
@@ -47,7 +51,7 @@ public class TokenService {
         try {
            mac = Mac.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
-          return true;
+          return false;
         }
         String secret = System.getenv("SpringBoot");
         SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),algorithm);

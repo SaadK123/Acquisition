@@ -19,8 +19,8 @@ public class ConnectionService {
 
 
     @Transactional
-    public PlayerDTO connectingThroughJWT(String tokenId) {
-        Token token = tokenService.findToken(tokenId);
+    public PlayerDTO connectingThroughJWT(RequestDTO requestDTO) {
+        Token token = tokenService.findToken(requestDTO);
 
         Player player = token.getPlayerRaw();
 
@@ -54,8 +54,8 @@ public class ConnectionService {
 
 
     @Transactional
-    public void logOut(String tokenId) {
-     Token token = tokenService.findToken(tokenId);
+    public void logOut(RequestDTO requestDTO) {
+     Token token = tokenService.findToken(requestDTO);
      entityManager.remove(token);
     }
 
