@@ -28,7 +28,7 @@ public class Token {
 
 
 
-
+    // todo maybe in the near future use a ManyToOne (no conflict between tokens from web and c#)
     @OneToOne(optional = false)
     private Player player;
 
