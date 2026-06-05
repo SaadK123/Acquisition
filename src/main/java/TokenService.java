@@ -3,6 +3,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class TokenService {
@@ -30,7 +34,34 @@ public class TokenService {
             return null;
         }
 
-         Mac mac = Utilitaries.mac;
-        
+        // 3 Verify if the signature is valid with the good secret
+
+
+    }
+
+
+    String algorithm = "HmacSHA256";
+    private boolean verifySignature(RequestDTO tokenRaw) {
+        Mac mac;
+
+        try {
+           mac = Mac.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+          return true;
+        }
+        String secret = System.getenv("SpringBoot");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),algorithm);
+
+
+        try {
+            mac.init(secretKeySpec);
+        } catch (Exception e) {
+           return false;
+        }
+
+        String signatureRaw = tokenRaw.tokenId() + tokenRaw.timestamp();
+        byte[] hmacBytes = mac.doFinal(signatureRaw.getBytes(StandardCharsets.UTF_8));
+
+       return  MessageDigest.isEqual(hmacBytes,tokenRaw.signature().getBytes(StandardCharsets.UTF_8));
     }
 }

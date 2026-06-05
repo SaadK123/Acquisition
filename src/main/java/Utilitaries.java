@@ -101,7 +101,7 @@ public class Utilitaries {
         try {
          mac = Mac.getInstance("HmacSHA256");
         }catch (Exception _) {}
-
-
     }
+
+
 }
