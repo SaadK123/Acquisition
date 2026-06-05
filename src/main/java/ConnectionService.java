@@ -19,21 +19,17 @@ public class ConnectionService {
 
 
     @Transactional
-    public PlayerDTO connectingThroughJWT(RequestDTO requestDTO) {
+    public Response connectingThroughJWT(RequestDTO requestDTO) {
         Token token = tokenService.findToken(requestDTO);
 
         Player player = token.getPlayerRaw();
-
-        if(player == null) {
-            return null;
-        }
-        return player.getPlayerInformations(null);
+        return new Response(player.getPlayerInformations(null),new Status(200,"connected"));
     }
 
 
 
     @Transactional
-    public PlayerDTO connectingThroughAuth(String username,String password) {
+    public Response connectingThroughAuth(String username,String password) {
         Player player;
         try {
           player   = entityManager.createQuery("select p from Player p where p.username = :username",Player.class)
@@ -49,14 +45,17 @@ public class ConnectionService {
             throw new AcquisitionException("username or/and password is wrong");
         }
 
-        return player.getPlayerInformations(UUID.randomUUID().toString());
+        return new Response(player.getPlayerInformations(UUID.randomUUID().toString()),
+                new Status(200,"connected"));
     }
 
 
     @Transactional
-    public void logOut(RequestDTO requestDTO) {
+    public Response logOut(RequestDTO requestDTO) {
      Token token = tokenService.findToken(requestDTO);
      entityManager.remove(token);
+
+     return new Response(null,new Status(200,"log out sucessfully"));
     }
 
 

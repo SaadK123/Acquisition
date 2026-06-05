@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Table(name = "player")
 @Entity
-
+@Setter
 @Getter
 public class Player {
 
@@ -26,7 +26,7 @@ public class Player {
         timeStart = Utilitaries.convertLongToDate(Utilitaries.now());
     }
 
-    @Setter
+
     @Column(unique = true)
     private String username;
 
@@ -37,18 +37,21 @@ public class Player {
 
 
 
-    @Setter
     @OneToMany
     private List<Building> buildings = new ArrayList<>();
 
 
-    @Setter
+
     @Column
     private String passwordHash;
 
 
     @Column
     private double money;
+
+
+    public void addMoney(double add) {money += add;}
+
 
 
     @OneToMany
