@@ -3,6 +3,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 
+import java.awt.image.TileObserver;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,8 @@ public class Player {
 
 
 
-    public PlayerDTO getPlayerInformations() {
-        return new PlayerDTO(id.toString(),username,money,lastTimeConnected,timeStart,buildings,investements);
+    public PlayerDTO getPlayerInformations(String tokenId) {
+        return new PlayerDTO(id.toString(),username,money,lastTimeConnected,timeStart,
+                buildings,investements,tokenId);
     }
 }

@@ -35,7 +35,7 @@ public class Token {
 
     public Player getPlayerRaw()  throws IllegalArgumentException {
         if(Utilitaries.now() >= expiredAt) {
-          throw new IllegalArgumentException("the token has expired");
+          return null;
         }
       return player;
     }
