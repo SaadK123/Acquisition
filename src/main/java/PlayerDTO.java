@@ -7,6 +7,5 @@ public record PlayerDTO(
         long lastTimeConnected,
         String firstTimeConnected,
         List<Building> buildings,
-        List<Investement> investements,
-        String tokenId) {
+        List<Investement> investements) {
 }

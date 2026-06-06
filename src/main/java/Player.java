@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Setter
 @Getter
-public class Player {
+public class Player implements IDto<PlayerDTO> {
 
     @Column
     private String timeStart;
@@ -59,8 +59,18 @@ public class Player {
 
 
 
-    public PlayerDTO getPlayerInformations(String tokenId) {
+
+
+    @Override
+    public PlayerDTO toDto() {
         return new PlayerDTO(id.toString(),username,money,lastTimeConnected,timeStart,
-                buildings,investements,tokenId);
+                buildings,investements);
+    }
+
+
+    public void addInvestment(MarketInvestment marketInvestment,double firstInvestment) {
+
+        String idInvestment = marketInvestment.getId() + id;
+        investements.add(new Investement(idInvestment,marketInvestment,firstInvestment,firstInvestment));
     }
 }

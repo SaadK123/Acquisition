@@ -2,7 +2,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Table(name = "expenses")
@@ -10,7 +12,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Expense {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Modifiers {
 
 
     @Id
@@ -19,5 +23,10 @@ public class Expense {
 
     @Column
     private double value;
+
+
+    @Column(nullable = false)
+    private boolean isUpgrade;
+
 
 }

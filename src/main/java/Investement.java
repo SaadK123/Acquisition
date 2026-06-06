@@ -1,10 +1,14 @@
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Table(name = "investements")
 
 @Getter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Investement {
 
 
@@ -16,10 +20,12 @@ public class Investement {
     private MarketInvestment marketInvestment;
 
 
-    private double firstInvestment;
+    private  double firstInvestment;
 
     @Column
     private double totalInvestment;
+
+
 
 
 
