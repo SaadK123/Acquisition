@@ -23,8 +23,6 @@ public class Building implements IDto<BuildingDTO> {
 
 
 
-    @ManyToOne
-    private Player player;
 
 
 
@@ -32,12 +30,14 @@ public class Building implements IDto<BuildingDTO> {
     private double price;
 
     @OneToMany
-   private  List<Modifiers> modifiers = new ArrayList<>();
+    private  List<Modifiers> modifiers = new ArrayList<>();
 
 
-
+    @ManyToOne
+    private Player player;
+    
     @Override
     public BuildingDTO toDto() {
-        return new BuildingDTO(id,price,modifiers);
+        return new BuildingDTO(id,price,modifiers,type);
     }
 }
