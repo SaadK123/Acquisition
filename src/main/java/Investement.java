@@ -29,5 +29,9 @@ public class Investement {
 
 
 
+    public void addMoney(double money) {
+        this.totalInvestment += money;
+    }
+
 
 }

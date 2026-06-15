@@ -26,6 +26,9 @@ public class MarketInvestment {
     @ElementCollection
     private List<Double> lastPrices;
 
+
+
+
     public MarketInvestment(String id,double initialPrice) {
         setPrice(initialPrice);
         this.id = id;
@@ -35,4 +38,8 @@ public class MarketInvestment {
     public void setPrice(double price) {
         pricePerStock = price;
     }
+
+
+
+
 }

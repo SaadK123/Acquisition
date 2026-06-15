@@ -24,9 +24,4 @@ public class Modifiers {
     @Column
     private double value;
 
-
-    @Column(nullable = false)
-    private boolean isUpgrade;
-
-
 }
