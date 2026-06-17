@@ -25,7 +25,7 @@ public class BuildingService {
     @Transactional
 
     public Response addBuildingToPlayer(Player player,Building building) {
-        if(building.getPlayer() != null) {
+        if(building.getPlayer() == null) {
            player.getBuildings().add(building);
            building.setPlayer(player);
 
@@ -36,6 +36,16 @@ public class BuildingService {
         }
 
         return new Response("building was not added",new Status(400,"error business"));
+    }
+
+
+
+    TokenService tokenService;
+
+    public Response getBuildingsFromPlayer(RequestDTO requestDTO) {
+        Token token = tokenService.findToken(requestDTO);
+
+        return new Response(token.getPlayerRaw().getBuildings(),new Status(200,"sucesss"));
     }
 
 

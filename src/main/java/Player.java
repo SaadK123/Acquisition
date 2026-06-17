@@ -68,9 +68,28 @@ public class Player implements IDto<PlayerDTO> {
     }
 
 
-    public void addInvestment(MarketInvestment marketInvestment,double firstInvestment) {
+
+
+    public Investement addInvestment(MarketInvestment marketInvestment,double firstInvestment) {
 
         String idInvestment = marketInvestment.getId() + id;
-        investements.add(new Investement(idInvestment,marketInvestment,firstInvestment,firstInvestment));
+
+        Investement investement = new Investement(idInvestment,marketInvestment,firstInvestment,firstInvestment);
+        investements.add(investement);
+
+
+        return investement;
+    }
+
+    public Investement findInvestementByMarket(MarketInvestment marketInvestment) {
+        for(int i = 0; i < investements.size(); ++i) {
+            Investement investement =  investements.get(i);
+            MarketInvestment currentMarket =  investement.getMarketInvestment();
+
+            if(currentMarket.getId().equals(marketInvestment.getId())) {
+                return investement;
+            }
+         }
+        return null;
     }
 }

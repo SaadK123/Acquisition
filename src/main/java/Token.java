@@ -16,9 +16,9 @@ public class Token {
     @Column(name = "expired_at")
     private long expiredAt;
 
-    public Token(String requestedBy) {
+    public Token(Player player) {
         expiredAt = Utilitaries.now() + Utilitaries.timeToken;
-
+        this.player =  player;
     }
 
 

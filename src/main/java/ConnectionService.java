@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 
@@ -23,7 +25,8 @@ public class ConnectionService {
         Token token = tokenService.findToken(requestDTO);
 
         Player player = token.getPlayerRaw();
-        return new Response(player.getPlayerInformations(null),new Status(200,"connected"));
+
+        return new Response(player.toDto(),new Status(200,"connected"));
     }
 
 
@@ -45,8 +48,18 @@ public class ConnectionService {
             throw new AcquisitionException("username or/and password is wrong");
         }
 
-        return new Response(player.getPlayerInformations(UUID.randomUUID().toString()),
-                new Status(200,"connected"));
+
+
+        HashMap<String,Object> container = new HashMap<>();
+
+
+        container.put("player",player.toDto());
+
+
+        Token token = new Token(player);
+
+        container.put("token",token.getId());
+        return new Response(container, new Status(200,"connected"));
     }
 
 
