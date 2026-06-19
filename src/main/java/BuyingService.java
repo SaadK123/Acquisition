@@ -68,4 +68,13 @@ public class BuyingService {
       }
       return buildingService.addBuildingToPlayer(player,building);
     }
+
+    public Response payPlayer(RequestDTO tokenRaw) {
+        Token token = tokenService.findToken(tokenRaw);
+
+        Player player = token.getPlayerRaw();
+
+
+
+    }
 }

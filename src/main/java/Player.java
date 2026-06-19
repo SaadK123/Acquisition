@@ -1,12 +1,14 @@
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.message.Message;
 import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 
 import java.awt.image.TileObserver;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Table(name = "player")
@@ -91,5 +93,12 @@ public class Player implements IDto<PlayerDTO> {
             }
          }
         return null;
+    }
+
+
+    public Response getPaid() {
+        List<Tuple<Double,String>> resultMoney = new ArrayList<>();
+
+        for()
     }
 }
