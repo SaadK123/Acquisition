@@ -96,9 +96,4 @@ public class Player implements IDto<PlayerDTO> {
     }
 
 
-    public Response getPaid() {
-        List<Tuple<Double,String>> resultMoney = new ArrayList<>();
-
-        for()
-    }
 }
