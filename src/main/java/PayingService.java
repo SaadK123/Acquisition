@@ -18,6 +18,13 @@ public class PayingService {
 
         Player player = token.getPlayerRaw();
 
+        List<BuildingReport> buildingReports = getAllBuildingsIncomeAndExpenses(player.getBuildings());
+
+
+
+    }
+
+    private List<InvestmentReport> getAllInvestmentsReport() {
 
     }
 
@@ -26,13 +33,23 @@ public class PayingService {
         List<BuildingReport> buildingReports = new ArrayList<>();
 
         for(Building building : buildings) {
-
+          buildingReports.add(getAllBuildingIncomeAndExpense(building));
         }
+        return buildingReports;
     }
+
 
     private BuildingReport getAllBuildingIncomeAndExpense(Building building) {
          var tuple_expenses = getBuildingIncomeOrExpense(building.getCosts(),false);
-         var tuple_
+         var tuple_profits = getBuildingIncomeOrExpense(building.getUpgrades(),true);
+
+         double totalMoney = tuple_profits.second - tuple_expenses.second;
+
+         building.getPlayer().addMoney(totalMoney);
+         
+
+         return new BuildingReport(building.getId(), building.getOriginName(),tuple_profits.first,
+                 tuple_expenses.first, tuple_profits.second, tuple_expenses.second, totalMoney);
     }
 
 

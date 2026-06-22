@@ -26,18 +26,32 @@ public class MarketInvestment {
     @ElementCollection
     private List<Double> lastPrices;
 
+    private int maxLastPrice = 5;
 
 
 
-    public MarketInvestment(String id,double initialPrice) {
-        setPrice(initialPrice);
+    public MarketInvestment(String id) {
         this.id = id;
+        setPrice(100);
     }
+
+    @Column(name = "growth_percentage")
+    private double growthPercentage;
 
     @JsonIgnore
     public void setPrice(double price) {
+        double difference =  price - pricePerStock;
+        growthPercentage = difference / pricePerStock * 100;
+
         pricePerStock = price;
+
+        if(lastPrices.size() == maxLastPrice) {
+            lastPrices.removeFirst();
+            lastPrices.add(pricePerStock);
+        }
     }
+
+
 
 
 
