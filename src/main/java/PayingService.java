@@ -20,12 +20,21 @@ public class PayingService {
 
         List<BuildingReport> buildingReports = getAllBuildingsIncomeAndExpenses(player.getBuildings());
 
+        List<InvestmentReport> investmentReports = getAllInvestmentsReport(player.getInvestements());
 
 
+        return new PlayerReport(buildingReports,investmentReports);
     }
 
-    private List<InvestmentReport> getAllInvestmentsReport() {
 
+    MarketInvService marketInvService;
+
+    private List<InvestmentReport> getAllInvestmentsReport(List<Investment> investments) {
+         List<InvestmentReport> investmentReports = new ArrayList<>();
+         for(var investment : investments) {
+           investmentReports.add(marketInvService.getInvestmentReport(investment));
+         }
+         return investmentReports;
     }
 
 

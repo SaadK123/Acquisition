@@ -3,10 +3,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.service.annotation.DeleteExchange;
 
 import java.util.List;
-import java.util.Stack;
 
 @Table(name = "market_investement")
 @Entity
@@ -20,11 +18,12 @@ public class MarketInvestment {
     private String  id;
 
     @Column(name = "price_per_stock")
-    private double pricePerStock;
+    private double currentPricePerStock;
 
 
     @ElementCollection
     private List<Double> lastPrices;
+
 
     private int maxLastPrice = 5;
 
@@ -40,15 +39,16 @@ public class MarketInvestment {
 
     @JsonIgnore
     public void setPrice(double price) {
-        double difference =  price - pricePerStock;
-        growthPercentage = difference / pricePerStock * 100;
+        double difference =  price - currentPricePerStock;
+        growthPercentage = difference / currentPricePerStock * 100;
 
-        pricePerStock = price;
 
         if(lastPrices.size() == maxLastPrice) {
             lastPrices.removeFirst();
-            lastPrices.add(pricePerStock);
         }
+        lastPrices.add(currentPricePerStock);
+
+        currentPricePerStock = price;
     }
 
 

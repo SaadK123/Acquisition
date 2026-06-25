@@ -39,8 +39,28 @@ public class MarketInvService {
             if(!rnd.nextBoolean()) {
                randomPriceVariation = -randomPriceVariation;
             }
-            final double newPrice = randomPriceVariation + marketInvestment.getPricePerStock();
+            final double newPrice = randomPriceVariation + marketInvestment.getCurrentPricePerStock();
             marketInvestment.setPrice(newPrice);
         }
+    }
+
+
+    public InvestmentReport getInvestmentReport(Investment investment) {
+       double lastPreviousPrice =  investment.getMarketInvestment().getLastPrices().getLast();
+
+       double currentPrice =  investment.getMarketInvestment().getCurrentPricePerStock();
+
+
+       double currentStockHold = investment.getStockBought();
+
+
+       double previousStockPower = lastPreviousPrice * currentStockHold,
+               currentStockPower = currentPrice * currentStockHold;
+
+       double netIncome = currentStockPower - previousStockPower;
+
+       double growth = netIncome / previousStockPower * 100;
+
+       return new InvestmentReport(investment.getId(),netIncome,previousStockPower,currentStockPower,growth);
     }
 }

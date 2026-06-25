@@ -1,14 +1,9 @@
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.message.Message;
-import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 
-import java.awt.image.TileObserver;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Table(name = "player")
@@ -57,7 +52,7 @@ public class Player implements IDto<PlayerDTO> {
 
 
     @OneToMany
-    private List<Investement> investements;
+    private List<Investment> investements;
 
 
 
@@ -72,20 +67,20 @@ public class Player implements IDto<PlayerDTO> {
 
 
 
-    public Investement addInvestment(MarketInvestment marketInvestment,double firstInvestment) {
+    public Investment addInvestment(MarketInvestment marketInvestment, double firstInvestment) {
 
         String idInvestment = marketInvestment.getId() + id;
 
-        Investement investement = new Investement(idInvestment,marketInvestment,firstInvestment,firstInvestment);
+        Investment investement = new Investment(idInvestment,marketInvestment,firstInvestment);
         investements.add(investement);
 
 
         return investement;
     }
 
-    public Investement findInvestementByMarket(MarketInvestment marketInvestment) {
+    public Investment findInvestementByMarket(MarketInvestment marketInvestment) {
         for(int i = 0; i < investements.size(); ++i) {
-            Investement investement =  investements.get(i);
+            Investment investement =  investements.get(i);
             MarketInvestment currentMarket =  investement.getMarketInvestment();
 
             if(currentMarket.getId().equals(marketInvestment.getId())) {
