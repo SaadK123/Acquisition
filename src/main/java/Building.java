@@ -4,14 +4,13 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Table(name = "buildings")
 @Getter
 @Setter
 
 @Entity
-public class Building implements IDto<BuildingDTO> {
+public class Building implements IDto<BuildingReport> {
 
 
     // nom du joueur + nom du building
@@ -34,21 +33,43 @@ public class Building implements IDto<BuildingDTO> {
     private double price;
 
     @OneToMany
-    private List<Modifiers> upgrades = new ArrayList<>();
+    private List<Modifier> upgrades = new ArrayList<>();
 
 
     @OneToMany
 
-    private List<Modifiers> costs = new ArrayList<>();
+    private List<Modifier> costs = new ArrayList<>();
 
     @ManyToOne
     private Player player;
 
 
 
-    @Override
-    public BuildingDTO toDto() {
-        return new BuildingDTO(id,price,upgrades,costs,type);
+
+
+    public BuildingReport toDto() {
+        var tuple_expenses = getBuildingIncomeOrExpense(costs);
+        var tuple_profits = getBuildingIncomeOrExpense(upgrades);
+
+        double totalMoney = tuple_profits.second - tuple_expenses.second;
+
+        player.addMoney(totalMoney);
+
+
+        return new BuildingReport(id,originName,tuple_profits.first,
+                tuple_expenses.first, tuple_profits.second, tuple_expenses.second, totalMoney);
+    }
+
+
+    private Tuple<List<ModifierReport>,Double> getBuildingIncomeOrExpense(List<Modifier> modifiers) {
+        double totalMoney = 0;
+        List<ModifierReport> reports = new ArrayList<>();
+        for(var modifier : modifiers) {
+            ModifierReport report =  modifier.toDto();
+            totalMoney += report.moneyWon();
+            reports.add(report);
+        }
+        return new Tuple<>(reports,totalMoney);
     }
 
 }

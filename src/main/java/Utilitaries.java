@@ -3,6 +3,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.Mac;
+import java.util.HashMap;
+import java.util.Random;
 
 public class Utilitaries {
 
@@ -105,6 +107,10 @@ public class Utilitaries {
 
 
 
+    final static Random rnd = new Random();
 
+    public static double randomChance() {
+        return rnd.nextInt();
+    }
 
 }

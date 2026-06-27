@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 
 @NoArgsConstructor
-public class Investment {
+public class Investment implements IDto<InvestmentReport> {
 
 
 
@@ -36,4 +36,19 @@ public class Investment {
     }
 
 
+    @Override
+    public InvestmentReport toDto() {
+        double lastPreviousPrice =  marketInvestment.getLastPrices().getLast();
+
+        double currentPrice =  marketInvestment.getCurrentPricePerStock();
+
+        double previousStockPower = lastPreviousPrice * stockBought,
+                currentStockPower = currentPrice * stockBought;
+
+        double netIncome = currentStockPower - previousStockPower;
+
+        double growth = netIncome / previousStockPower * 100;
+
+        return new InvestmentReport(id,netIncome,previousStockPower,currentStockPower,growth);
+    }
 }
