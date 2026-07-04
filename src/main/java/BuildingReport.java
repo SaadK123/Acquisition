@@ -1,16 +1,16 @@
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 
+public class BuildingReport  extends GameReport  {
 
-public record BuildingReport(String buildingId,
-                             String buildingName,
-                             List<ModifierReport> profits,
-                             List<ModifierReport> expenses,
-                             double totalProfit,
-                             double totalExpenses,
-                             double netProfit
-) {
+    private final BuildingProfile buildingProfile;
+
+
+    public BuildingReport(BuildingProfile buildingProfile,double totalProfit,
+                          double totalExpenses) {
+        super(totalProfit,totalExpenses);
+        this.buildingProfile = buildingProfile;
+    }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 
 @Entity
-public class Building implements IDto<BuildingReport> {
+public class Building implements GameStateDTO<BuildingReport> {
 
 
     // nom du joueur + nom du building
@@ -49,9 +49,9 @@ public class Building implements IDto<BuildingReport> {
         var tuple_expenses = getBuildingIncomeOrExpense(costs);
         var tuple_profits = getBuildingIncomeOrExpense(upgrades);
 
-        double totalMoney = tuple_profits.second - tuple_expenses.second;
+
         return new BuildingReport(id,originName,tuple_profits.first,
-               tuple_expenses.first, tuple_profits.second, tuple_expenses.second, totalMoney);
+               tuple_expenses.first, tuple_profits.second, tuple_expenses.second);
     }
 
 

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 
 @NoArgsConstructor
-public class Investment implements IDto<InvestmentReport> {
+public class Investment implements GameStateDTO<InvestmentReport> {
 
 
 

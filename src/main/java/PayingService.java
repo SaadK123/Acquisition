@@ -1,5 +1,8 @@
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class PayingService {
 
@@ -12,7 +15,22 @@ public class PayingService {
      public PlayerReport payPlayer(RequestDTO requestDTO) {
         Token token =  tokenService.findToken(requestDTO);
         Player player = token.getPlayerRaw();
-        return player.report();
+
     }
+
+    private PlayerReport getPlayerReport() {
+
+    }
+
+    private List<InvestmentReport> getAllInvestmentsReport(List<Investment> investments) {
+        List<InvestmentReport> investmentReports = new ArrayList<>();
+        for(var investment : investments) {
+            investmentReports.add(investment.report());
+
+        }
+        return investmentReports;
+    }
+
+
 
 }

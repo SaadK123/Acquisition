@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Setter
 @Getter
-public class Player implements IDto<PlayerReport> {
+public class Player {
 
     @Column
     private String timeStart;
@@ -55,28 +55,12 @@ public class Player implements IDto<PlayerReport> {
     private List<Investment> investments;
 
 
-    @Override
-    public PlayerReport report() {
-      return new PlayerReport(getAllBuildingsIncomeAndExpenses(buildings),getAllInvestmentsReport(investments),money);
-    }
 
-    private List<InvestmentReport> getAllInvestmentsReport(List<Investment> investments) {
-        List<InvestmentReport> investmentReports = new ArrayList<>();
-        for(var investment : investments) {
-            investmentReports.add(investment.report());
-        }
-        return investmentReports;
+    public PlayerReport report(List<InvestmentReport> investmentReports, List<BuildingReport> buildingReports) {
+      return new PlayerReport(buildingReports,investmentReports,money);
     }
 
 
-    private List<BuildingReport> getAllBuildingsIncomeAndExpenses(List<Building> buildings) {
-        List<BuildingReport> buildingReports = new ArrayList<>();
-
-        for(Building building : buildings) {
-            buildingReports.add(building.report());
-        }
-        return buildingReports;
-    }
 
 
     public Investment addInvestment(MarketInvestment marketInvestment, double firstInvestment) {
@@ -91,14 +75,13 @@ public class Player implements IDto<PlayerReport> {
     }
 
     public Investment findInvestementByMarket(MarketInvestment marketInvestment) {
-        for(int i = 0; i < investments.size(); ++i) {
-            Investment investement =  investments.get(i);
-            MarketInvestment currentMarket =  investement.getMarketInvestment();
+        for (Investment investment : investments) {
+            MarketInvestment currentMarket = investment.getMarketInvestment();
 
-            if(currentMarket.getId().equals(marketInvestment.getId())) {
-                return investement;
+            if (currentMarket.getId().equals(marketInvestment.getId())) {
+                return investment;
             }
-         }
+        }
         return null;
     }
 

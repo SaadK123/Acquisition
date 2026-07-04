@@ -15,7 +15,7 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Modifier  implements IDto<ModifierReport> {
+public class Modifier  implements GameStateDTO<ModifierReport>, {
 
 
     @Id
@@ -45,5 +45,7 @@ public class Modifier  implements IDto<ModifierReport> {
 
         return new ModifierReport(totalMoney,message,lostMoney, key);
     }
+
+    public
 
 }

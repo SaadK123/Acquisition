@@ -3,7 +3,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.Mac;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class Utilitaries {
@@ -111,6 +113,20 @@ public class Utilitaries {
 
     public static double randomChance() {
         return rnd.nextInt();
+    }
+
+
+    public    <T,E> Tuple<Double,List<T>> getAllBuildingsIncomeAndExpenses(List<Building> buildings) {
+        List<T> buildingReports = new ArrayList<>();
+        double profit = 0;
+        for(E building : buildings) {
+            BuildingReport buildingReport = building.report();
+            buildingReports.add(T);
+
+            profit += buildingReport.netProfit;
+
+        }
+        return new Tuple<>(profit,buildingReports);
     }
 
 }
