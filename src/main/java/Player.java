@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Setter
 @Getter
-public class Player implements IDto<PlayerDTO> {
+public class Player implements IDto<PlayerReport> {
 
     @Column
     private String timeStart;
@@ -52,35 +52,47 @@ public class Player implements IDto<PlayerDTO> {
 
 
     @OneToMany
-    private List<Investment> investements;
-
-
-
+    private List<Investment> investments;
 
 
     @Override
-    public PlayerDTO toDto() {
-        return new PlayerDTO(id.toString(),username,money,lastTimeConnected,timeStart,
-                buildings,investements);
+    public PlayerReport report() {
+      return new PlayerReport(getAllBuildingsIncomeAndExpenses(buildings),getAllInvestmentsReport(investments),money);
+    }
+
+    private List<InvestmentReport> getAllInvestmentsReport(List<Investment> investments) {
+        List<InvestmentReport> investmentReports = new ArrayList<>();
+        for(var investment : investments) {
+            investmentReports.add(investment.report());
+        }
+        return investmentReports;
     }
 
 
+    private List<BuildingReport> getAllBuildingsIncomeAndExpenses(List<Building> buildings) {
+        List<BuildingReport> buildingReports = new ArrayList<>();
+
+        for(Building building : buildings) {
+            buildingReports.add(building.report());
+        }
+        return buildingReports;
+    }
 
 
     public Investment addInvestment(MarketInvestment marketInvestment, double firstInvestment) {
 
         String idInvestment = marketInvestment.getId() + id;
 
-        Investment investement = new Investment(idInvestment,marketInvestment,firstInvestment);
-        investements.add(investement);
+        Investment investment = new Investment(idInvestment,marketInvestment,firstInvestment);
+        investments.add(investment);
 
 
-        return investement;
+        return investment;
     }
 
     public Investment findInvestementByMarket(MarketInvestment marketInvestment) {
-        for(int i = 0; i < investements.size(); ++i) {
-            Investment investement =  investements.get(i);
+        for(int i = 0; i < investments.size(); ++i) {
+            Investment investement =  investments.get(i);
             MarketInvestment currentMarket =  investement.getMarketInvestment();
 
             if(currentMarket.getId().equals(marketInvestment.getId())) {
@@ -89,6 +101,5 @@ public class Player implements IDto<PlayerDTO> {
          }
         return null;
     }
-
 
 }

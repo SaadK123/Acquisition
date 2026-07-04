@@ -45,19 +45,13 @@ public class Building implements IDto<BuildingReport> {
 
 
 
-
-
-    public BuildingReport toDto() {
+    public BuildingReport report() {
         var tuple_expenses = getBuildingIncomeOrExpense(costs);
         var tuple_profits = getBuildingIncomeOrExpense(upgrades);
 
         double totalMoney = tuple_profits.second - tuple_expenses.second;
-
-        player.addMoney(totalMoney);
-
-
         return new BuildingReport(id,originName,tuple_profits.first,
-                tuple_expenses.first, tuple_profits.second, tuple_expenses.second, totalMoney);
+               tuple_expenses.first, tuple_profits.second, tuple_expenses.second, totalMoney);
     }
 
 
@@ -65,7 +59,7 @@ public class Building implements IDto<BuildingReport> {
         double totalMoney = 0;
         List<ModifierReport> reports = new ArrayList<>();
         for(var modifier : modifiers) {
-            ModifierReport report =  modifier.toDto();
+            ModifierReport report =  modifier.report();
             totalMoney += report.moneyWon();
             reports.add(report);
         }

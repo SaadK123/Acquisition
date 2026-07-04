@@ -2,7 +2,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "investements")
+@Table(name = "investments")
 
 @Getter
 @Entity
@@ -37,18 +37,18 @@ public class Investment implements IDto<InvestmentReport> {
 
 
     @Override
-    public InvestmentReport toDto() {
+    public InvestmentReport report() {
         double lastPreviousPrice =  marketInvestment.getLastPrices().getLast();
 
         double currentPrice =  marketInvestment.getCurrentPricePerStock();
 
-        double previousStockPower = lastPreviousPrice * stockBought,
-                currentStockPower = currentPrice * stockBought;
+        double previousNetWorth = lastPreviousPrice * stockBought,
+                currentNetWorth = currentPrice * stockBought;
 
-        double netIncome = currentStockPower - previousStockPower;
+        double netIncome = currentNetWorth - previousNetWorth;
 
-        double growth = netIncome / previousStockPower * 100;
+        double growth = netIncome / previousNetWorth * 100;
 
-        return new InvestmentReport(id,netIncome,previousStockPower,currentStockPower,growth);
+        return new InvestmentReport(id,netIncome, previousNetWorth, currentNetWorth,growth);
     }
 }

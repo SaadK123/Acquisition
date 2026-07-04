@@ -1,4 +1,4 @@
 public interface IDto<T> {
 
-    public T toDto();
+    public T report();
 }

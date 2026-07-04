@@ -30,7 +30,7 @@ public class Modifier  implements IDto<ModifierReport> {
 
     private boolean isIncome;
 
-    public ModifierReport toDto() {
+    public ModifierReport report() {
         double lostPercentage = Utilitaries.randomChance();
 
         double lostMoney = lostPercentage * value;

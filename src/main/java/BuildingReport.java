@@ -1,4 +1,9 @@
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+
 import java.util.List;
+
+
 
 public record BuildingReport(String buildingId,
                              String buildingName,
