@@ -112,21 +112,10 @@ public class Utilitaries {
     final static Random rnd = new Random();
 
     public static double randomChance() {
-        return rnd.nextInt();
+        return rnd.nextInt(1,101);
     }
 
 
-    public    <T,E> Tuple<Double,List<T>> getAllBuildingsIncomeAndExpenses(List<Building> buildings) {
-        List<T> buildingReports = new ArrayList<>();
-        double profit = 0;
-        for(E building : buildings) {
-            BuildingReport buildingReport = building.report();
-            buildingReports.add(T);
 
-            profit += buildingReport.netProfit;
-
-        }
-        return new Tuple<>(profit,buildingReports);
-    }
 
 }

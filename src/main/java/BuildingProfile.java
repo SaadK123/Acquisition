@@ -4,6 +4,5 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
-public record BuildingProfile(String buildingId,String buildingName,List<ModifierReport> profits,
-                              List<ModifierReport> expenses)
+public record BuildingProfile(String buildingId,String buildingName,List<ModifierReport> modifiersReport)
 { }

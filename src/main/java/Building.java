@@ -4,6 +4,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Table(name = "buildings")
 @Getter
@@ -36,6 +37,7 @@ public class Building implements GameStateDTO<BuildingReport> {
     private List<Modifier> upgrades = new ArrayList<>();
 
 
+
     @OneToMany
 
     private List<Modifier> costs = new ArrayList<>();
@@ -48,10 +50,15 @@ public class Building implements GameStateDTO<BuildingReport> {
     public BuildingReport report() {
         var tuple_expenses = getBuildingIncomeOrExpense(costs);
         var tuple_profits = getBuildingIncomeOrExpense(upgrades);
+        return new BuildingReport(createReport(tuple_profits.first,tuple_expenses.first),
+                tuple_profits.second, tuple_expenses.second);
+    }
 
+    private BuildingProfile createReport(List<ModifierReport> upgrades,List<ModifierReport> costs) {
 
-        return new BuildingReport(id,originName,tuple_profits.first,
-               tuple_expenses.first, tuple_profits.second, tuple_expenses.second);
+        List<ModifierReport> combined = Stream.concat(upgrades.stream(), costs.stream())
+                .toList();
+        return new BuildingProfile(id,originName,combined);
     }
 
 

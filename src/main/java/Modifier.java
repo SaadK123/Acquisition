@@ -15,7 +15,7 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Modifier  implements GameStateDTO<ModifierReport>, {
+public class Modifier  implements GameStateDTO<ModifierReport> {
 
 
     @Id
@@ -26,14 +26,16 @@ public class Modifier  implements GameStateDTO<ModifierReport>, {
     private double value;
 
 
+
+
     @Column
 
     private boolean isIncome;
 
     public ModifierReport report() {
-        double lostPercentage = Utilitaries.randomChance();
+        double valuePercentage = Utilitaries.randomChance();
 
-        double lostMoney = lostPercentage * value;
+        double lostMoney = valuePercentage * value;
 
         double totalMoney = isIncome ? value - lostMoney : value + lostMoney;
 
@@ -43,9 +45,9 @@ public class Modifier  implements GameStateDTO<ModifierReport>, {
             message += "you" + (isIncome ? " lost money from this gain":"you paid more this time") + lostMoney + "$";
         }
 
-        return new ModifierReport(totalMoney,message,lostMoney, key);
+        return new ModifierReport();
     }
 
-    public
+
 
 }

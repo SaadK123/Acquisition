@@ -1,4 +1,4 @@
 public interface ProfileDTO<T> {
 
-    public T fullReport();
+    public T smallReport();
 }
