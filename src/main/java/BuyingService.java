@@ -41,11 +41,11 @@ public class BuyingService {
         }
 
 
-        Investement investement = player.findInvestementByMarket(marketInvestment);
+        Investment investement = player.findInvestementByMarket(marketInvestment);
 
 
         if(investement != null) {
-           investement.addMoney(amount);
+           investement.addStock(amount);
         }else {
             // if no investemnt exist
             investement =  player.addInvestment(marketInvestment, amount);

@@ -14,7 +14,7 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Modifiers {
+public class Modifier  {
 
 
     @Id
@@ -23,5 +23,9 @@ public class Modifiers {
 
     @Column
     private double value;
+
+    @Column
+
+    private boolean isIncome;
 
 }

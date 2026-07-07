@@ -1,5 +1,8 @@
 public record InvestmentReport(
-        String marketInvestement,
+        String investementId,
         double netIncome,
-        double growthPercentageFromTheLastFive) {
+        double lastMoney,
+        double currentMoney,
+        double growthPercentage
+        ) {
 }

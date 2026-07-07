@@ -1,15 +1,10 @@
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 
 @Service
@@ -26,7 +21,7 @@ public class ConnectionService {
 
         Player player = token.getPlayerRaw();
 
-        return new Response(player.toDto(),new Status(200,"connected"));
+        return new Response(player.report(),new Status(200,"connected"));
     }
 
 
@@ -53,7 +48,7 @@ public class ConnectionService {
         HashMap<String,Object> container = new HashMap<>();
 
 
-        container.put("player",player.toDto());
+        container.put("player",player.report());
 
 
         Token token = new Token(player);

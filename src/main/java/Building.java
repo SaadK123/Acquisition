@@ -4,14 +4,14 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.stream.Stream;
 
 @Table(name = "buildings")
 @Getter
 @Setter
 
 @Entity
-public class Building implements IDto<BuildingDTO> {
+public class Building {
 
 
     // nom du joueur + nom du building
@@ -34,21 +34,16 @@ public class Building implements IDto<BuildingDTO> {
     private double price;
 
     @OneToMany
-    private List<Modifiers> upgrades = new ArrayList<>();
+    private List<Modifier> upgrades = new ArrayList<>();
+
 
 
     @OneToMany
 
-    private List<Modifiers> costs = new ArrayList<>();
+    private List<Modifier> costs = new ArrayList<>();
 
     @ManyToOne
     private Player player;
 
-
-
-    @Override
-    public BuildingDTO toDto() {
-        return new BuildingDTO(id,price,upgrades,costs,type);
-    }
 
 }

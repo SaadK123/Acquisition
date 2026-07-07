@@ -1,21 +1,16 @@
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.message.Message;
-import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 
-import java.awt.image.TileObserver;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Table(name = "player")
 @Entity
 @Setter
 @Getter
-public class Player implements IDto<PlayerDTO> {
+public class Player {
 
     @Column
     private String timeStart;
@@ -57,43 +52,29 @@ public class Player implements IDto<PlayerDTO> {
 
 
     @OneToMany
-    private List<Investement> investements;
+    private List<Investment> investments;
 
 
-
-
-
-    @Override
-    public PlayerDTO toDto() {
-        return new PlayerDTO(id.toString(),username,money,lastTimeConnected,timeStart,
-                buildings,investements);
-    }
-
-
-
-
-    public Investement addInvestment(MarketInvestment marketInvestment,double firstInvestment) {
+    public Investment addInvestment(MarketInvestment marketInvestment, double firstInvestment) {
 
         String idInvestment = marketInvestment.getId() + id;
 
-        Investement investement = new Investement(idInvestment,marketInvestment,firstInvestment,firstInvestment);
-        investements.add(investement);
+        Investment investment = new Investment(idInvestment,marketInvestment,firstInvestment);
+        investments.add(investment);
 
 
-        return investement;
+        return investment;
     }
 
-    public Investement findInvestementByMarket(MarketInvestment marketInvestment) {
-        for(int i = 0; i < investements.size(); ++i) {
-            Investement investement =  investements.get(i);
-            MarketInvestment currentMarket =  investement.getMarketInvestment();
+    public Investment findInvestementByMarket(MarketInvestment marketInvestment) {
+        for (Investment investment : investments) {
+            MarketInvestment currentMarket = investment.getMarketInvestment();
 
-            if(currentMarket.getId().equals(marketInvestment.getId())) {
-                return investement;
+            if (currentMarket.getId().equals(marketInvestment.getId())) {
+                return investment;
             }
-         }
+        }
         return null;
     }
-
 
 }

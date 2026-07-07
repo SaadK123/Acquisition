@@ -3,6 +3,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.Mac;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 public class Utilitaries {
 
@@ -103,6 +107,13 @@ public class Utilitaries {
         }catch (Exception _) {}
     }
 
+
+
+    final static Random rnd = new Random();
+
+    public static double randomChance() {
+        return rnd.nextInt(1,101);
+    }
 
 
 
