@@ -18,18 +18,46 @@ public class PayingService {
 
     }
 
-    private PlayerReport getPlayerReport() {
 
+
+    /**
+    SECTION 1 :
+    CONTAINS BUILDING REPORTS
+
+    BUILDING HAVE MODIFIERS SO THESE TWO METHODS ARE LINKED TO THE SAME
+    SECTION.
+     */
+    private List<BuildingReport> buildingReports(List<Building> buildings) {
+         List<BuildingReport> buildingReports = new ArrayList<>();
+         for(Building building : buildings) {
+             
+         }
     }
 
-    private List<InvestmentReport> getAllInvestmentsReport(List<Investment> investments) {
-        List<InvestmentReport> investmentReports = new ArrayList<>();
-        for(var investment : investments) {
-            investmentReports.add(investment.report());
+    private Tuple<Double,List<ModifierReport>>  modifiersReports(List<Modifier> modifiers,boolean isIncome) {
+        List<ModifierReport> modifierReports = new ArrayList<>();
 
-        }
-        return investmentReports;
+        double netProfitBuilding = 0;
+         for(Modifier modifier : modifiers) {
+             double valuePercentage = Utilitaries.randomChance();
+
+             double totalWon = valuePercentage * modifier.getValue();
+
+             netProfitBuilding += modifier.isIncome() ? totalWon:-totalWon;
+
+             double totalLost = totalWon / valuePercentage;
+
+             modifierReports.add(new ModifierReport(totalWon,totalLost,valuePercentage,modifier));
+         }
+
+         return new Tuple<>(netProfitBuilding,modifierReports);
     }
+
+    /* END OF SECTION 1*/
+
+
+
+
 
 
 

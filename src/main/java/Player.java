@@ -55,14 +55,6 @@ public class Player {
     private List<Investment> investments;
 
 
-
-    public PlayerReport report(List<InvestmentReport> investmentReports, List<BuildingReport> buildingReports) {
-      return new PlayerReport(buildingReports,investmentReports,money);
-    }
-
-
-
-
     public Investment addInvestment(MarketInvestment marketInvestment, double firstInvestment) {
 
         String idInvestment = marketInvestment.getId() + id;

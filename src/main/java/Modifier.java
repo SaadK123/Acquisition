@@ -1,4 +1,3 @@
-import com.mongodb.client.model.ValidationAction;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,7 +14,7 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Modifier  implements GameStateDTO<ModifierReport> {
+public class Modifier  {
 
 
     @Id
@@ -25,29 +24,8 @@ public class Modifier  implements GameStateDTO<ModifierReport> {
     @Column
     private double value;
 
-
-
-
     @Column
 
     private boolean isIncome;
-
-    public ModifierReport report() {
-        double valuePercentage = Utilitaries.randomChance();
-
-        double lostMoney = valuePercentage * value;
-
-        double totalMoney = isIncome ? value - lostMoney : value + lostMoney;
-
-        String message = (isIncome ? "you gained " : "you paid ") + totalMoney + "$" + " from " + key ;
-
-        if (lostMoney > 0) {
-            message += "you" + (isIncome ? " lost money from this gain":"you paid more this time") + lostMoney + "$";
-        }
-
-        return new ModifierReport();
-    }
-
-
 
 }

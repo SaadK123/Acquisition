@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 @Setter
 
 @Entity
-public class Building implements GameStateDTO<BuildingReport> {
+public class Building {
 
 
     // nom du joueur + nom du building
@@ -45,32 +45,5 @@ public class Building implements GameStateDTO<BuildingReport> {
     @ManyToOne
     private Player player;
 
-
-
-    public BuildingReport report() {
-        var tuple_expenses = getBuildingIncomeOrExpense(costs);
-        var tuple_profits = getBuildingIncomeOrExpense(upgrades);
-        return new BuildingReport(createReport(tuple_profits.first,tuple_expenses.first),
-                tuple_profits.second, tuple_expenses.second);
-    }
-
-    private BuildingProfile createReport(List<ModifierReport> upgrades,List<ModifierReport> costs) {
-
-        List<ModifierReport> combined = Stream.concat(upgrades.stream(), costs.stream())
-                .toList();
-        return new BuildingProfile(id,originName,combined);
-    }
-
-
-    private Tuple<List<ModifierReport>,Double> getBuildingIncomeOrExpense(List<Modifier> modifiers) {
-        double totalMoney = 0;
-        List<ModifierReport> reports = new ArrayList<>();
-        for(var modifier : modifiers) {
-            ModifierReport report =  modifier.report();
-            totalMoney += report.moneyWon();
-            reports.add(report);
-        }
-        return new Tuple<>(reports,totalMoney);
-    }
 
 }
