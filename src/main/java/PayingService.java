@@ -16,6 +16,7 @@ public class PayingService {
         Token token =  tokenService.findToken(requestDTO);
         Player player = token.getPlayerRaw();
 
+
     }
 
 
@@ -24,41 +25,56 @@ public class PayingService {
     SECTION 1 :
     CONTAINS BUILDING REPORTS
 
+    NOTE :
     BUILDING HAVE MODIFIERS SO THESE TWO METHODS ARE LINKED TO THE SAME
     SECTION.
      */
-    private List<BuildingReport> buildingReports(List<Building> buildings) {
+    private Tuple<Double,List<BuildingReport>> buildingReports(List<Building> buildings) {
          List<BuildingReport> buildingReports = new ArrayList<>();
+
+         double totalNetProfit = 0;
          for(Building building : buildings) {
-             
+             var tuple = modifiersReports(building.getModifiers());
+
+             var salesInfo = tuple.first;
+
+             var buildingReport = new BuildingReport(new BuildingProfile(building),
+                     salesInfo.totalProfit, salesInfo.totalExpenses);
+
+             totalNetProfit += buildingReport.getNetProfit();
+             buildingReports.add(buildingReport);
          }
+         return new Tuple<>(totalNetProfit,buildingReports);
     }
 
-    private Tuple<Double,List<ModifierReport>>  modifiersReports(List<Modifier> modifiers,boolean isIncome) {
+
+    private record SalesInfo(double totalProfit, double totalExpenses){}
+
+    private Tuple<SalesInfo,List<ModifierReport>>  modifiersReports(List<Modifier> modifiers) {
         List<ModifierReport> modifierReports = new ArrayList<>();
 
-        double netProfitBuilding = 0;
-         for(Modifier modifier : modifiers) {
+        double totalExpenses = 0;
+
+        double totalProfits = 0;
+
+        for(Modifier modifier : modifiers) {
              double valuePercentage = Utilitaries.randomChance();
 
              double totalWon = valuePercentage * modifier.getValue();
 
-             netProfitBuilding += modifier.isIncome() ? totalWon:-totalWon;
+             if(modifier.isIncome()) {
+                 totalProfits += totalWon;
+             }else {
+                 totalExpenses += totalWon;
+             }
 
              double totalLost = totalWon / valuePercentage;
 
              modifierReports.add(new ModifierReport(totalWon,totalLost,valuePercentage,modifier));
          }
 
-         return new Tuple<>(netProfitBuilding,modifierReports);
+         return new Tuple<>(new SalesInfo(totalProfits,totalExpenses),modifierReports);
     }
 
     /* END OF SECTION 1*/
-
-
-
-
-
-
-
 }
