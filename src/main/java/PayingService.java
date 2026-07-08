@@ -16,7 +16,7 @@ public class PayingService {
         Token token =  tokenService.findToken(requestDTO);
         Player player = token.getPlayerRaw();
 
-
+        
     }
 
 
@@ -90,8 +90,13 @@ public class PayingService {
 
     private List<InvestmentReport> investmentReports(List<Investment> investments) {
         List<InvestmentReport> investmentReports = new ArrayList<>();
-        for(Investment investment : investments) {
-           investmentReports.add(new InvestmentReport())
-        }
+
+        for(Investment investment : investments) investmentReports.add(new InvestmentReport(investment));
+
+        return investmentReports;
     }
+
+    /*END OF SECTION 2*/
+
+
 }
