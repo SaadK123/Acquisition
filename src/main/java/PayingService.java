@@ -60,21 +60,38 @@ public class PayingService {
         for(Modifier modifier : modifiers) {
              double valuePercentage = Utilitaries.randomChance();
 
-             double totalWon = valuePercentage * modifier.getValue();
+             var modifierReport  = new ModifierReport(valuePercentage,modifier);
+
+             var totalMoney = modifierReport.getTotalMoney();
 
              if(modifier.isIncome()) {
-                 totalProfits += totalWon;
+                 totalProfits += totalMoney;
              }else {
-                 totalExpenses += totalWon;
+                 totalExpenses += totalMoney;
              }
 
-             double totalLost = totalWon / valuePercentage;
 
-             modifierReports.add(new ModifierReport(totalWon,totalLost,valuePercentage,modifier));
+             modifierReports.add(modifierReport);
          }
 
          return new Tuple<>(new SalesInfo(totalProfits,totalExpenses),modifierReports);
     }
 
     /* END OF SECTION 1*/
+
+
+    /**
+     SECTION 2:
+     CONTAINS INVESTMENTS REPORTS
+
+     NOTE :
+     N/A
+     */
+
+    private List<InvestmentReport> investmentReports(List<Investment> investments) {
+        List<InvestmentReport> investmentReports = new ArrayList<>();
+        for(Investment investment : investments) {
+           investmentReports.add(new InvestmentReport())
+        }
+    }
 }
