@@ -1,5 +1,7 @@
 import lombok.Getter;
 
+import java.util.List;
+
 public class BuildingReport   {
 
     private final BuildingProfile buildingProfile;
@@ -8,8 +10,8 @@ public class BuildingReport   {
     @Getter
     private final double totalProfit,totalExpenses,netProfit;
 
-    public BuildingReport(BuildingProfile buildingProfile,double totalProfit,
-                          double totalExpenses) {
+    public BuildingReport(BuildingProfile buildingProfile, double totalProfit,
+                          double totalExpenses, List<ModifierReport> modifierReports) {
         this.totalProfit = totalProfit;
         this.totalExpenses = totalExpenses;
 

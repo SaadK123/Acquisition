@@ -16,7 +16,14 @@ public class PayingService {
         Token token =  tokenService.findToken(requestDTO);
         Player player = token.getPlayerRaw();
 
-        
+        var tuple = buildingReports(player.getBuildings());
+
+        var investmentReports = investmentReports(player.getInvestments());
+
+        var totalMoney = tuple.first;
+
+
+        return new PlayerReport(tuple.second,investmentReports,totalMoney);
     }
 
 
@@ -39,9 +46,10 @@ public class PayingService {
              var salesInfo = tuple.first;
 
              var buildingReport = new BuildingReport(new BuildingProfile(building),
-                     salesInfo.totalProfit, salesInfo.totalExpenses);
+                     salesInfo.totalProfit, salesInfo.totalExpenses,tuple.second);
 
              totalNetProfit += buildingReport.getNetProfit();
+
              buildingReports.add(buildingReport);
          }
          return new Tuple<>(totalNetProfit,buildingReports);
