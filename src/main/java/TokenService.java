@@ -2,70 +2,122 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class TokenService {
 
 
-    EntityManager entityManager;
+
+
+
 
 
     // TODO ALL NULL MUST BE REPLACED BY Exceptions
     @Transactional
-    public Token findToken(RequestDTO tokenRaw) {
-        // 1 test if the time is t0o far away
-        if(Utilitaries.getDeltaTime(tokenRaw.timestamp()) >= 5000) {
-            return null;
-        }
+    public String findToken(RequestDTO tokenRaw) {
+        String tokenId = tokenRaw.tokenId();
 
-        // 2 verify if the token is valid
-         Token token;
-        try {
-            token = entityManager.createQuery("select t from Token t where t.id = :tokenId",Token.class)
-                    .setParameter("tokenId",tokenRaw.tokenId()).getSingleResult();
-
-            if(!token.isTokenValid()) {return null;}
-        } catch (Exception e) {
-            return null;
-        }
-
-        // 3 Verify if the signature is valid with the good secret
-        boolean verifySignature = verifySignature(tokenRaw);
-
-        if(!verifySignature){
-            return null;
-        }
-     return token;
+        
     }
 
 
-    String algorithm = "HmacSHA256";
-    private boolean verifySignature(RequestDTO tokenRaw) {
-        Mac mac;
 
-        try {
-           mac = Mac.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-          return false;
+
+    private record TokenMetaData(String playerId,long timeExpiration,boolean isWeb) {}
+
+    private final ConcurrentHashMap<String,TokenMetaData> tokenToDataMap = new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String,String> playerToTokensMap = new ConcurrentHashMap<>();
+
+
+
+
+
+    private static SecureRandom rnd = new SecureRandom();
+
+
+    public String generateToken(String playerId, boolean isWeb) {
+
+        StringBuilder token = new StringBuilder();
+
+        for(int i = 0; i < 300; ++i) {
+           int randChar =  rnd.nextInt(33,127);
+
+           char c = (char) randChar;
+
+           token.append(c);
         }
-        String secret = System.getenv("SpringBoot");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),algorithm);
+
+        String tokenStringify = token.toString();
 
 
-        try {
-            mac.init(secretKeySpec);
-        } catch (Exception e) {
-           return false;
-        }
 
-        String signatureRaw = tokenRaw.tokenId() + tokenRaw.timestamp();
-        byte[] hmacBytes = mac.doFinal(signatureRaw.getBytes(StandardCharsets.UTF_8));
-
-       return  MessageDigest.isEqual(hmacBytes,tokenRaw.signature().getBytes(StandardCharsets.UTF_8));
+        return tokenStringify;
     }
+
+
+    private void addToken(String token,String playerId,boolean isWeb) {
+
+        // 1 : first find if player id has already a used token for either web or unity
+
+         String tokensRaw = playerToTokensMap.get(playerId);
+
+         if(tokensRaw == null) {
+             addTokenInRegistries(token,isWeb,playerId,token);
+             return;
+         }
+
+         String[] tokensIds = tokensRaw.split(" ");
+
+         String compositeKey =  token + " ";
+
+         for(String tokenId : tokensIds) {
+             TokenMetaData currentTokenData = tokenToDataMap.get(tokenId);
+
+             if(currentTokenData.isWeb() == isWeb) {
+                 removeTokenFromRegistries(tokenId,playerId);
+
+             }else {
+                 compositeKey += tokenId;
+             }
+         }
+
+         addTokenInRegistries(token,isWeb,playerId,compositeKey);
+
+    }
+    private void addTokenInRegistries(String tokenId, boolean isWeb, String playerId, String compositeKey) {
+        tokenToDataMap.put(tokenId,new TokenMetaData(playerId,Utilitaries.nowToken(), isWeb));
+        playerToTokensMap.put(playerId,compositeKey);
+    }
+
+    private void removeTokenFromRegistries(String token, String playerId) {
+
+        // remove from token to data registry
+
+        tokenToDataMap.remove(token);
+
+        //  get from player to tokens  registry
+
+        String[] tokensId = playerToTokensMap.get(playerId).split(" ");
+
+
+        // check if one token and if yes  remove all the registry
+        if(tokensId.length == 1) {
+            playerToTokensMap.remove(playerId);
+        }else {
+            // else keep the token out
+            String keeperToken =  token.equals(tokensId[0]) ?  tokensId[1]:tokensId[0];
+            playerToTokensMap.put(playerId,keeperToken);
+        }
+
+    }
+
+
+
+
+
+
+
 }

@@ -17,6 +17,9 @@ public class Utilitaries {
     }
 
 
+    public static long nowToken() {return now() + timeToken;}
+
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
@@ -29,11 +32,11 @@ public class Utilitaries {
 
             boolean isBisextile = isBisextile(lastCompleteYear);
 
-            long seuilAnnee = isBisextile ? 31622400L : 31536000L;
-            if(seconds < seuilAnnee) {
+            long year = isBisextile ? 31622400L : 31536000L;
+            if(seconds < year) {
                 break;
             }
-            seconds -= seuilAnnee;
+            seconds -= year;
             lastCompleteYear++;
         }
         return new long[]{lastCompleteYear,seconds};
@@ -114,6 +117,7 @@ public class Utilitaries {
     public static double randomChance() {
         return rnd.nextInt(1,101);
     }
+
 
 
 
