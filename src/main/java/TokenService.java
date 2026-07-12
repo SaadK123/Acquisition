@@ -2,16 +2,15 @@
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Duration;
 
 @Service
 public class TokenService {
 
 
 
-
-
     StringRedisTemplate stringRedisTemplate;
+
 
 
     public String findPlayerWithToken(RequestDTO tokenRaw) {
@@ -19,9 +18,9 @@ public class TokenService {
 
          String rawDataToken = stringRedisTemplate.opsForValue().get(tokenId);
 
-         
+         TokenMetaData data = TokenMetaData.deserialize(rawDataToken);
 
-         if(data == null || data.timeExpiration <= Utilitaries.now() || data.isWeb != tokenRaw.forWeb()) {
+         if(data == null || data.isWeb != tokenRaw.forWeb()) {
              throw new AcquisitionException("token has expired or not use in the good format");
          }
 
@@ -31,7 +30,31 @@ public class TokenService {
 
 
 
-    private record TokenMetaData(String playerId,boolean isWeb) {}
+    private record TokenMetaData(String playerId,boolean isWeb) {
+        private static String serialize(TokenMetaData tmd) {
+            return tmd.playerId + " " + tmd.isWeb;
+        }
+
+
+        public static void saveSerializedToken(String tokenId, TokenMetaData tokenMetaData,
+                                               StringRedisTemplate redisTemplate) {
+
+            redisTemplate.opsForValue().setIfAbsent(tokenId, serialize(tokenMetaData), Duration.ofDays(5));
+        }
+
+
+
+        public static TokenMetaData deserialize(String serializedMetaData) {
+            if(serializedMetaData == null) {return null;}
+            String[] serializedValues = serializedMetaData.split(" ");
+
+            String booleanValueRaw  = serializedValues[1];
+
+            boolean isWeb = booleanValueRaw.equals("true");
+
+            return new TokenMetaData(serializedValues[0],isWeb);
+        }
+    }
 
 
 
@@ -39,7 +62,7 @@ public class TokenService {
 
 
 
-    private static SecureRandom rnd = new SecureRandom();
+    private static final SecureRandom rnd = new SecureRandom();
 
 
     public String generateToken(String playerId, boolean isWeb) {
@@ -66,7 +89,7 @@ public class TokenService {
 
         // 1 : first find if player id has already a used token for either web or unity
 
-         String tokensRaw = playerToTokensMap.get(playerId);
+         String tokensRaw = stringRedisTemplate.opsForValue().get(playerId);
 
          if(tokensRaw == null) {
              addTokenInRegistries(token,isWeb,playerId,token);
@@ -75,47 +98,28 @@ public class TokenService {
 
          String[] tokensIds = tokensRaw.split(" ");
 
-         String compositeKey =  token + " ";
+         StringBuilder compositeKey = new StringBuilder(token + " ");
 
          for(String tokenId : tokensIds) {
-             TokenMetaData currentTokenData = tokenToDataMap.get(tokenId);
+             String rawValue = stringRedisTemplate.opsForValue().get(tokenId);
 
-             if(currentTokenData.isWeb() == isWeb) {
-                 removeTokenFromRegistries(tokenId,playerId);
+             TokenMetaData currentToken = TokenMetaData.deserialize(rawValue);
 
-             }else {
-                 compositeKey += tokenId;
+             if(currentToken == null || currentToken.isWeb() == isWeb) {
+                continue;
              }
+
+             compositeKey.append(tokenId);
          }
 
-         addTokenInRegistries(token,isWeb,playerId,compositeKey);
-
+         addTokenInRegistries(token,isWeb,playerId, compositeKey.toString());
     }
     private void addTokenInRegistries(String tokenId, boolean isWeb, String playerId, String compositeKey) {
-        tokenToDataMap.put(tokenId,new TokenMetaData(playerId,isWeb));
-        playerToTokensMap.put(playerId,compositeKey);
+
+        TokenMetaData.saveSerializedToken(tokenId,new TokenMetaData(playerId,isWeb),stringRedisTemplate);
+        stringRedisTemplate.opsForValue().set(playerId,compositeKey);
     }
 
-    private void removeTokenFromRegistries(String token, String playerId) {
 
-        // remove from token to data registry
-
-        tokenToDataMap.remove(token);
-
-        //  get from player to tokens  registry
-
-        String[] tokensId = playerToTokensMap.get(playerId).split(" ");
-
-
-        // check if one token and if yes  remove all the registry
-        if(tokensId.length == 1) {
-            playerToTokensMap.remove(playerId);
-        }else {
-            // else keep the token out
-            String keeperToken =  token.equals(tokensId[0]) ?  tokensId[1]:tokensId[0];
-            playerToTokensMap.put(playerId,keeperToken);
-        }
-
-    }
 
 }
