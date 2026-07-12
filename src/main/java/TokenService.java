@@ -54,6 +54,10 @@ public class TokenService {
 
             return new TokenMetaData(serializedValues[0],isWeb);
         }
+
+        public static void deleteTokenBasedMap(String tokenId,StringRedisTemplate template) {
+            template.delete(tokenId);
+        }
     }
 
 
@@ -105,11 +109,14 @@ public class TokenService {
 
              TokenMetaData currentToken = TokenMetaData.deserialize(rawValue);
 
-             if(currentToken == null || currentToken.isWeb() == isWeb) {
-                continue;
+             if(currentToken == null) { continue;}
+
+             if(currentToken.isWeb() == isWeb) {
+              TokenMetaData.deleteTokenBasedMap(tokenId,stringRedisTemplate);
+             }else {
+                 compositeKey.append(tokenId);
              }
 
-             compositeKey.append(tokenId);
          }
 
          addTokenInRegistries(token,isWeb,playerId, compositeKey.toString());
