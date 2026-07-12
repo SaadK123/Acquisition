@@ -1,11 +1,7 @@
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.LifecycleState;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class BuildingService {
@@ -43,7 +39,7 @@ public class BuildingService {
     TokenService tokenService;
 
     public Response getBuildingsFromPlayer(RequestDTO requestDTO) {
-        Token token = tokenService.findToken(requestDTO);
+        Token token = tokenService.findPlayerWithToken(requestDTO);
 
         return new Response(token.getPlayerRaw().getBuildings(),new Status(200,"sucesss"));
     }

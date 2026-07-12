@@ -17,7 +17,7 @@ public class ConnectionService {
 
     @Transactional
     public Response connectingThroughJWT(RequestDTO requestDTO) {
-        Token token = tokenService.findToken(requestDTO);
+        Token token = tokenService.findPlayerWithToken(requestDTO);
 
         Player player = token.getPlayerRaw();
 
@@ -60,7 +60,7 @@ public class ConnectionService {
 
     @Transactional
     public Response logOut(RequestDTO requestDTO) {
-     Token token = tokenService.findToken(requestDTO);
+     Token token = tokenService.findPlayerWithToken(requestDTO);
      entityManager.remove(token);
 
      return new Response(null,new Status(200,"log out sucessfully"));

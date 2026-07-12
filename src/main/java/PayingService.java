@@ -13,7 +13,7 @@ public class PayingService {
      }
 
      public PlayerReport payPlayer(RequestDTO requestDTO) {
-        Token token =  tokenService.findToken(requestDTO);
+        Token token =  tokenService.findPlayerWithToken(requestDTO);
         Player player = token.getPlayerRaw();
 
         var tuple = buildingReports(player.getBuildings());

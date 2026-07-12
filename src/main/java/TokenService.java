@@ -1,7 +1,5 @@
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,12 +12,18 @@ public class TokenService {
 
 
 
-    // TODO ALL NULL MUST BE REPLACED BY Exceptions
-    @Transactional
-    public String findToken(RequestDTO tokenRaw) {
+
+
+    public String findPlayerWithToken(RequestDTO tokenRaw) {
         String tokenId = tokenRaw.tokenId();
 
-        
+         TokenMetaData data = tokenToDataMap.get(tokenId);
+
+         if(data.timeExpiration <= Utilitaries.now() || data.isWeb != tokenRaw.forWeb()) {
+             throw new AcquisitionException("token has expired or not use in the good format");
+         }
+
+         return data.playerId;
     }
 
 
@@ -52,7 +56,7 @@ public class TokenService {
 
         String tokenStringify = token.toString();
 
-
+        addToken(tokenStringify,playerId,isWeb);
 
         return tokenStringify;
     }
@@ -113,11 +117,5 @@ public class TokenService {
         }
 
     }
-
-
-
-
-
-
 
 }

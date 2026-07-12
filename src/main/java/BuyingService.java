@@ -16,7 +16,7 @@ public class BuyingService {
 
     @Transactional
     public Response buyInvestment(RequestDTO tokenRaw,String market,double amount) {
-        Token token = tokenService.findToken(tokenRaw
+        Token token = tokenService.findPlayerWithToken(tokenRaw
          );
 
         Player player = token.getPlayerRaw();
@@ -57,7 +57,7 @@ public class BuyingService {
 
     @Transactional
     public Response buyBuilding(RequestDTO tokenRaw,String buildingId) {
-      Token token = tokenService.findToken(tokenRaw);
+      Token token = tokenService.findPlayerWithToken(tokenRaw);
 
       Player player = token.getPlayerRaw();
 
