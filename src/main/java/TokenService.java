@@ -1,4 +1,5 @@
 
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,16 +11,17 @@ public class TokenService {
 
 
 
-
-
+    StringRedisTemplate stringRedisTemplate;
 
 
     public String findPlayerWithToken(RequestDTO tokenRaw) {
         String tokenId = tokenRaw.tokenId();
 
-         TokenMetaData data = tokenToDataMap.get(tokenId);
+         String rawDataToken = stringRedisTemplate.opsForValue().get(tokenId);
 
-         if(data.timeExpiration <= Utilitaries.now() || data.isWeb != tokenRaw.forWeb()) {
+         
+
+         if(data == null || data.timeExpiration <= Utilitaries.now() || data.isWeb != tokenRaw.forWeb()) {
              throw new AcquisitionException("token has expired or not use in the good format");
          }
 
@@ -29,11 +31,9 @@ public class TokenService {
 
 
 
-    private record TokenMetaData(String playerId,long timeExpiration,boolean isWeb) {}
+    private record TokenMetaData(String playerId,boolean isWeb) {}
 
-    private final ConcurrentHashMap<String,TokenMetaData> tokenToDataMap = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<String,String> playerToTokensMap = new ConcurrentHashMap<>();
 
 
 
@@ -92,7 +92,7 @@ public class TokenService {
 
     }
     private void addTokenInRegistries(String tokenId, boolean isWeb, String playerId, String compositeKey) {
-        tokenToDataMap.put(tokenId,new TokenMetaData(playerId,Utilitaries.nowToken(), isWeb));
+        tokenToDataMap.put(tokenId,new TokenMetaData(playerId,isWeb));
         playerToTokensMap.put(playerId,compositeKey);
     }
 
