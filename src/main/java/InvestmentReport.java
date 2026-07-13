@@ -23,6 +23,6 @@ public class InvestmentReport {
                netIncome = currentMoney - lastMoney;
 
 
-               growthPercentage = (currentMoney - lastMoney) / lastMoney;
+               growthPercentage = netIncome / lastMoney;
         }
 }
