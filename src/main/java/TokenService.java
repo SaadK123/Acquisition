@@ -1,5 +1,6 @@
 
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -13,18 +14,22 @@ public class TokenService {
 
 
 
-    public String findPlayerWithToken(RequestDTO tokenRaw) {
-        String tokenId = tokenRaw.tokenId();
+    public String findPlayerWithToken(String tokenId,boolean isWeb) {
+
 
          String rawDataToken = stringRedisTemplate.opsForValue().get(tokenId);
 
          TokenMetaData data = TokenMetaData.deserialize(rawDataToken);
 
-         if(data == null || data.isWeb != tokenRaw.forWeb()) {
+         if(data == null || data.isWeb != isWeb) {
              throw new AcquisitionException("token has expired or not use in the good format");
          }
 
          return data.playerId;
+    }
+
+    private String findPlayerWithToken(String tokenId) {
+        return stringRedisTemplate.opsForValue().get(tokenId);
     }
 
 
@@ -36,10 +41,10 @@ public class TokenService {
         }
 
 
-        public static void saveSerializedToken(String tokenId, TokenMetaData tokenMetaData,
+        public static boolean saveSerializedToken(String tokenId, TokenMetaData tokenMetaData,
                                                StringRedisTemplate redisTemplate) {
 
-            redisTemplate.opsForValue().setIfAbsent(tokenId, serialize(tokenMetaData), Duration.ofDays(5));
+           return redisTemplate.opsForValue().setIfAbsent(tokenId, serialize(tokenMetaData), Duration.ofDays(5));
         }
 
 
@@ -69,7 +74,7 @@ public class TokenService {
     private static final SecureRandom rnd = new SecureRandom();
 
 
-    public String generateToken(String playerId, boolean isWeb) {
+    private String generateToken() {
 
         StringBuilder token = new StringBuilder();
 
@@ -80,23 +85,37 @@ public class TokenService {
 
            token.append(c);
         }
-
-        String tokenStringify = token.toString();
-
-        addToken(tokenStringify,playerId,isWeb);
-
-        return tokenStringify;
+        return token.toString();
     }
 
 
+    public String createToken(String playerId,boolean isWeb) {
+        String token;
+
+        while(true) {
+            token = generateToken();
+
+             boolean hasSet = TokenMetaData.saveSerializedToken(token,
+                     new TokenMetaData(playerId,isWeb),stringRedisTemplate);
+             if(hasSet) {
+                 break;
+             }
+        }
+        addToken(token,playerId,isWeb);
+        return token;
+    }
+
+
+
     private void addToken(String token,String playerId,boolean isWeb) {
+
 
         // 1 : first find if player id has already a used token for either web or unity
 
          String tokensRaw = stringRedisTemplate.opsForValue().get(playerId);
 
          if(tokensRaw == null) {
-             addTokenInRegistries(token,isWeb,playerId,token);
+             stringRedisTemplate.opsForValue().set(playerId,token);
              return;
          }
 
@@ -117,15 +136,12 @@ public class TokenService {
                  compositeKey.append(tokenId);
              }
 
+
          }
 
-         addTokenInRegistries(token,isWeb,playerId, compositeKey.toString());
+        stringRedisTemplate.opsForValue().set(playerId,compositeKey.toString());
     }
-    private void addTokenInRegistries(String tokenId, boolean isWeb, String playerId, String compositeKey) {
 
-        TokenMetaData.saveSerializedToken(tokenId,new TokenMetaData(playerId,isWeb),stringRedisTemplate);
-        stringRedisTemplate.opsForValue().set(playerId,compositeKey);
-    }
 
 
 

@@ -38,8 +38,7 @@ public class Building {
 
 
     public BuildingProfile getBuildingProfile() {
-
-
+        return new BuildingProfile(this);
     }
     @ManyToOne
     private Player player;

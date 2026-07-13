@@ -17,11 +17,11 @@ public class ConnectionService {
 
     @Transactional
     public Response connectingThroughJWT(RequestDTO requestDTO) {
-        Token token = tokenService.findPlayerWithToken(requestDTO);
+        String playerId  = tokenService.findPlayerWithToken(requestDTO.tokenId(), requestDTO.forWeb());
 
-        Player player = token.getPlayerRaw();
-
-        return new Response(player.report(),new Status(200,"connected"));
+        Player player = entityManager.createQuery("select Player p from Player  where p.id =: id",Player.class)
+                .setParameter("id",playerId).getSingleResult();
+        return new Response(player.,new Status(200,"connected"));
     }
 
 

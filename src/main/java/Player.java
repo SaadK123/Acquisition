@@ -47,6 +47,7 @@ public class Player {
     private double money;
 
 
+
     public void addMoney(double add) {money += add;}
 
 
@@ -75,6 +76,17 @@ public class Player {
             }
         }
         return null;
+    }
+
+
+    public List<BuildingProfile> getAllBuildingsProfile() {
+        List<BuildingProfile> buildingProfiles = new ArrayList<>();
+
+        for(Building building : buildings) {
+            buildingProfiles.add(building.getBuildingProfile());
+        }
+
+        return buildingProfiles;
     }
 
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "market_investement")
@@ -22,10 +23,10 @@ public class MarketInvestment {
 
 
     @ElementCollection
-    private List<Double> lastPrices;
+    private List<Double> lastPrices = new ArrayList<>();
 
 
-    private int maxLastPrice = 5;
+    private int maxLastPrice = 50;
 
 
 

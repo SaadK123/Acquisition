@@ -1,0 +1,2 @@
+public record InvestmentProfile() {
+}

@@ -30,6 +30,7 @@ public class Investment {
 
 
 
+
     public void addStock(double money) {
         double addStock = money / marketInvestment.getCurrentPricePerStock();
         this.stockBought += addStock;
