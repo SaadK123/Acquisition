@@ -25,6 +25,12 @@ public class TokenService {
              throw new AcquisitionException("token has expired or not use in the good format");
          }
 
+         boolean hasSet = stringRedisTemplate.opsForValue().setIfAbsent("BUSY"+tokenId,"",Duration.ofMinutes(10));
+
+         if(!hasSet) {
+             throw new AcquisitionException("token is already being in use");
+         }
+
          return data.playerId;
     }
 
@@ -56,6 +62,10 @@ public class TokenService {
             String booleanValueRaw  = serializedValues[1];
 
             boolean isWeb = booleanValueRaw.equals("true");
+
+            booleanValueRaw = serializedValues[2];
+
+
 
             return new TokenMetaData(serializedValues[0],isWeb);
         }

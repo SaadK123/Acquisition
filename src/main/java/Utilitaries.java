@@ -102,14 +102,6 @@ public class Utilitaries {
     public static final long timeToken = 432000000L;
 
 
-    public static  Mac mac;
-
-    static {
-        try {
-         mac = Mac.getInstance("HmacSHA256");
-        }catch (Exception _) {}
-    }
-
 
 
     final static Random rnd = new Random();
