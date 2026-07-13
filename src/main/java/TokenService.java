@@ -63,10 +63,6 @@ public class TokenService {
 
             boolean isWeb = booleanValueRaw.equals("true");
 
-            booleanValueRaw = serializedValues[2];
-
-
-
             return new TokenMetaData(serializedValues[0],isWeb);
         }
 
