@@ -1,71 +1,154 @@
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.parameters.P;
+import org.springframework.stereotype.Service;
+import java.security.SecureRandom;
+import java.time.Duration;
 
 @Service
 public class TokenService {
 
 
-    EntityManager entityManager;
+
+    StringRedisTemplate stringRedisTemplate;
 
 
-    // TODO ALL NULL MUST BE REPLACED BY Exceptions
-    @Transactional
-    public Token findToken(RequestDTO tokenRaw) {
-        // 1 test if the time is t0o far away
-        if(Utilitaries.getDeltaTime(tokenRaw.timestamp()) >= 5000) {
-            return null;
-        }
 
-        // 2 verify if the token is valid
-         Token token;
-        try {
-            token = entityManager.createQuery("select t from Token t where t.id = :tokenId",Token.class)
-                    .setParameter("tokenId",tokenRaw.tokenId()).getSingleResult();
+    public String findPlayerWithToken(String tokenId,boolean isWeb) {
 
-            if(!token.isTokenValid()) {return null;}
-        } catch (Exception e) {
-            return null;
-        }
 
-        // 3 Verify if the signature is valid with the good secret
-        boolean verifySignature = verifySignature(tokenRaw);
+         String rawDataToken = stringRedisTemplate.opsForValue().get(tokenId);
 
-        if(!verifySignature){
-            return null;
-        }
-     return token;
+         TokenMetaData data = TokenMetaData.deserialize(rawDataToken);
+
+         if(data == null || data.isWeb != isWeb) {
+             throw new AcquisitionException("token has expired or not use in the good format");
+         }
+
+         boolean hasSet = stringRedisTemplate.opsForValue().setIfAbsent("BUSY"+tokenId,"",Duration.ofMinutes(10));
+
+         if(!hasSet) {
+             throw new AcquisitionException("token is already being in use");
+         }
+
+         return data.playerId;
+    }
+
+    private String findPlayerWithToken(String tokenId) {
+        return stringRedisTemplate.opsForValue().get(tokenId);
     }
 
 
-    String algorithm = "HmacSHA256";
-    private boolean verifySignature(RequestDTO tokenRaw) {
-        Mac mac;
-
-        try {
-           mac = Mac.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-          return false;
-        }
-        String secret = System.getenv("SpringBoot");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),algorithm);
 
 
-        try {
-            mac.init(secretKeySpec);
-        } catch (Exception e) {
-           return false;
+    private record TokenMetaData(String playerId,boolean isWeb) {
+        private static String serialize(TokenMetaData tmd) {
+            return tmd.playerId + " " + tmd.isWeb;
         }
 
-        String signatureRaw = tokenRaw.tokenId() + tokenRaw.timestamp();
-        byte[] hmacBytes = mac.doFinal(signatureRaw.getBytes(StandardCharsets.UTF_8));
 
-       return  MessageDigest.isEqual(hmacBytes,tokenRaw.signature().getBytes(StandardCharsets.UTF_8));
+        public static boolean saveSerializedToken(String tokenId, TokenMetaData tokenMetaData,
+                                               StringRedisTemplate redisTemplate) {
+
+           return redisTemplate.opsForValue().setIfAbsent(tokenId, serialize(tokenMetaData), Duration.ofDays(5));
+        }
+
+
+
+        public static TokenMetaData deserialize(String serializedMetaData) {
+            if(serializedMetaData == null) {return null;}
+            String[] serializedValues = serializedMetaData.split(" ");
+
+            String booleanValueRaw  = serializedValues[1];
+
+            boolean isWeb = booleanValueRaw.equals("true");
+
+            return new TokenMetaData(serializedValues[0],isWeb);
+        }
+
+        public static void deleteTokenBasedMap(String tokenId,StringRedisTemplate template) {
+            template.delete(tokenId);
+        }
     }
+
+
+
+
+
+
+
+    private static final SecureRandom rnd = new SecureRandom();
+
+
+    private String generateToken() {
+
+        StringBuilder token = new StringBuilder();
+
+        for(int i = 0; i < 300; ++i) {
+           int randChar =  rnd.nextInt(33,127);
+
+           char c = (char) randChar;
+
+           token.append(c);
+        }
+        return token.toString();
+    }
+
+
+    public String createToken(String playerId,boolean isWeb) {
+        String token;
+
+        while(true) {
+            token = generateToken();
+
+             boolean hasSet = TokenMetaData.saveSerializedToken(token,
+                     new TokenMetaData(playerId,isWeb),stringRedisTemplate);
+             if(hasSet) {
+                 break;
+             }
+        }
+        addToken(token,playerId,isWeb);
+        return token;
+    }
+
+
+
+    private void addToken(String token,String playerId,boolean isWeb) {
+
+
+        // 1 : first find if player id has already a used token for either web or unity
+
+         String tokensRaw = stringRedisTemplate.opsForValue().get(playerId);
+
+         if(tokensRaw == null) {
+             stringRedisTemplate.opsForValue().set(playerId,token);
+             return;
+         }
+
+         String[] tokensIds = tokensRaw.split(" ");
+
+         StringBuilder compositeKey = new StringBuilder(token + " ");
+
+         for(String tokenId : tokensIds) {
+             String rawValue = stringRedisTemplate.opsForValue().get(tokenId);
+
+             TokenMetaData currentToken = TokenMetaData.deserialize(rawValue);
+
+             if(currentToken == null) { continue;}
+
+             if(currentToken.isWeb() == isWeb) {
+              TokenMetaData.deleteTokenBasedMap(tokenId,stringRedisTemplate);
+             }else {
+                 compositeKey.append(tokenId);
+             }
+
+
+         }
+
+        stringRedisTemplate.opsForValue().set(playerId,compositeKey.toString());
+    }
+
+
+
+
 }

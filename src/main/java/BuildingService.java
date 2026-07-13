@@ -1,15 +1,15 @@
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.apache.catalina.LifecycleState;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class BuildingService {
+
+
     EntityManager entityManager;
+
+    FindingService findingService;
 
     @Transactional
     public Building findBuilding(String buildingId) {
@@ -43,9 +43,11 @@ public class BuildingService {
     TokenService tokenService;
 
     public Response getBuildingsFromPlayer(RequestDTO requestDTO) {
-        Token token = tokenService.findToken(requestDTO);
+        String playerId = tokenService.findPlayerWithToken(requestDTO.tokenId(),requestDTO.forWeb());
 
-        return new Response(token.getPlayerRaw().getBuildings(),new Status(200,"sucesss"));
+        Player player = findingService.findPlayer(playerId);
+
+        return new Response(player.getAllBuildingsProfile(),new Status(200,"sucess"));
     }
 
 

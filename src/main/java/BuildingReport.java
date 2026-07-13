@@ -1,17 +1,17 @@
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
-
 
 public class BuildingReport   {
 
     private final BuildingProfile buildingProfile;
 
 
+    @Getter
     private final double totalProfit,totalExpenses,netProfit;
 
-    public BuildingReport(BuildingProfile buildingProfile,double totalProfit,
-                          double totalExpenses) {
+    public BuildingReport(BuildingProfile buildingProfile, double totalProfit,
+                          double totalExpenses, List<ModifierReport> modifierReports) {
         this.totalProfit = totalProfit;
         this.totalExpenses = totalExpenses;
 
@@ -20,4 +20,5 @@ public class BuildingReport   {
 
         this.buildingProfile = buildingProfile;
     }
+
 }

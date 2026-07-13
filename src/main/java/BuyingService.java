@@ -14,12 +14,17 @@ public class BuyingService {
 
     EntityManager entityManager;
 
+
+    FindingService findingService;
+
     @Transactional
     public Response buyInvestment(RequestDTO tokenRaw,String market,double amount) {
-        Token token = tokenService.findToken(tokenRaw
-         );
 
-        Player player = token.getPlayerRaw();
+        String token = tokenRaw.tokenId();
+
+        String playerId = tokenService.findPlayerWithToken(token,tokenRaw.forWeb());
+
+        Player player = findingService.findPlayer(token);
 
         entityManager.refresh(player, LockModeType.PESSIMISTIC_WRITE);
 
@@ -57,9 +62,9 @@ public class BuyingService {
 
     @Transactional
     public Response buyBuilding(RequestDTO tokenRaw,String buildingId) {
-      Token token = tokenService.findToken(tokenRaw);
+      String playerId = tokenService.findPlayerWithToken(tokenRaw.tokenId(), tokenRaw.forWeb());
 
-      Player player = token.getPlayerRaw();
+      Player player = findingService.findPlayer(playerId);
 
       Building building = buildingService.findBuilding(buildingId);
       double price = building.getPrice();

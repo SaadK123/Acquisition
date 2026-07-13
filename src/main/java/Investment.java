@@ -18,6 +18,10 @@ public class Investment {
     @ManyToOne
     private MarketInvestment marketInvestment;
 
+
+    @Column(name = "total_money_invested")
+    double investmentMoney;
+
     public Investment(String id, MarketInvestment marketInvestment, double firstInvestment) {
         this.id = id;
         this.marketInvestment  = marketInvestment;
@@ -30,9 +34,15 @@ public class Investment {
 
 
 
+    public InvestmentProfile getInvestmentProfile() {
+        return new InvestmentProfile(this);
+    }
+
     public void addStock(double money) {
         double addStock = money / marketInvestment.getCurrentPricePerStock();
         this.stockBought += addStock;
+
+        this.investmentMoney += money;
     }
 
 

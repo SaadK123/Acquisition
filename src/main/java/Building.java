@@ -34,14 +34,12 @@ public class Building {
     private double price;
 
     @OneToMany
-    private List<Modifier> upgrades = new ArrayList<>();
+    private List<Modifier> modifiers = new ArrayList<>();
 
 
-
-    @OneToMany
-
-    private List<Modifier> costs = new ArrayList<>();
-
+    public BuildingProfile getBuildingProfile() {
+        return new BuildingProfile(this);
+    }
     @ManyToOne
     private Player player;
 
