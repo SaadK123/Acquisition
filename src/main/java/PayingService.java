@@ -6,9 +6,9 @@ import java.util.List;
 @Service
 public class PayingService {
 
-    TokenService tokenService;
+    TokenCloudService tokenService;
 
-     public PayingService(TokenService tokenService) {
+     public PayingService(TokenCloudService tokenService) {
         this.tokenService = tokenService;
      }
 

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BuyingService {
 
-    TokenService tokenService;
+    TokenCloudService tokenService;
 
     BuildingService buildingService;
 

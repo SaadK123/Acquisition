@@ -40,7 +40,7 @@ public class BuildingService {
 
 
 
-    TokenService tokenService;
+    TokenCloudService tokenService;
 
     public Response getBuildingsFromPlayer(RequestDTO requestDTO) {
         String playerId = tokenService.findPlayerWithToken(requestDTO.tokenId(),requestDTO.forWeb());

@@ -12,7 +12,7 @@ public class ConnectionService {
 
     EntityManager entityManager;
     PasswordEncoder passwordEncoder;
-    TokenService tokenService;
+    TokenCloudService tokenService;
 
 
     @Transactional
