@@ -145,7 +145,8 @@ public class AuthenticateCloudService extends TokenService {
         while(true) {
             authenticator = generateToken();
 
-             boolean hasSet = stringRedisTemplate.opsForValue().setIfAbsent(authenticator,playerId, Duration.ofDays(3));
+            String tokenData = playerId + " " + requestCloudDto.isWeb;
+             boolean hasSet = stringRedisTemplate.opsForValue().setIfAbsent(authenticator,tokenData, Duration.ofDays(3));
              if(hasSet) {
                  break;
              }
@@ -156,14 +157,56 @@ public class AuthenticateCloudService extends TokenService {
 
 
 
-    String addTokenInRedis = """
+    String addTokenInRedis = luaCodeSplit + """
             
+            local function getTokenData(val) 
+            
+            return redis.call('GET',val)
+            
+            end
+            
+            local tokenId = ARGV[1]
+            local source = ARGV[2]
+            
+            local playerId = ARGV[3]
+            
+             local rawValues =  redis.call('GET',playerId)
+            
+             if not rawValues  or #rawValues == 0 then
+             
+             
+             redis.call('SET',playerId,tokenId)
+             
+             return 
+             end
+             
+              local listValue =  split(rawValues)
+              
+              
+              local finalValue = tokenId
+              
+              for i = 1 , #listValue do
+              
+               local tokenDataRaw =  getTokenData(listValue[i])
+               
+               if tokenDataRaw  then
+               
+               -- retrieve token data 1 element will be the player id second element will be the source ex : true if web
+               
+                local tokenData =  split(tokenDataRaw)  
+               
+                
+                   if tokenData[2] ~= source then
+                   finalValue = finalValue .. " " .. listValue[i]
+                   
+                   redis.call('SET',playerId,finalValue)
+                   
+                   return 
+                   end
+                end
+                
+               end
+          
             """;
-
-
-
-
-
-
 
 }
