@@ -1,16 +1,21 @@
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.core.stringRedisTemplate;
 import org.springframework.stereotype.Service;
+
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class AuthenticateCloudService extends TokenService {
 
 
 
-    RedisTemplate<String,String> redisTemplate;
+    StringRedisTemplate stringRedisTemplate;
 
 
     String luaCodeFind = """
@@ -92,45 +97,23 @@ public class AuthenticateCloudService extends TokenService {
 
     public String findPlayerWithAuth(RequestDTO requestDTO) {
 
-         String authenticatorId =  requestDTO.authenticatorId;
-
          RequestCloudDto requestCloudDto = (RequestCloudDto) requestDTO;
 
+         String tokenId = requestCloudDto.authenticatorId;
 
-         redisTemplate.execute();
+         String isWeb = requestCloudDto.isWeb + "";
 
-         return data.playerId;
+        List<String> strings = new ArrayList<>() {{
+            add(tokenId);
+            add(isWeb);
+        }};
+
+        RedisScript<String> script = RedisScript.of(luaCodeFind, String.class);
+
+        return stringRedisTemplate.execute(script, Collections.emptyList(),strings);
     }
 
-    private record TokenMetaData(String playerId,boolean isWeb) {
-        private static String serialize(TokenMetaData tmd) {
-            return tmd.playerId + " " + tmd.isWeb;
-        }
 
-
-        public static boolean saveSerializedToken(String tokenId, TokenMetaData tokenMetaData,
-                                               StringRedisTemplate redisTemplate) {
-
-           return redisTemplate.opsForValue().setIfAbsent(tokenId, serialize(tokenMetaData), Duration.ofDays(5));
-        }
-
-
-
-        public static TokenMetaData deserialize(String serializedMetaData) {
-            if(serializedMetaData == null) {return null;}
-            String[] serializedValues = serializedMetaData.split(" ");
-
-            String booleanValueRaw  = serializedValues[1];
-
-            boolean isWeb = booleanValueRaw.equals("true");
-
-            return new TokenMetaData(serializedValues[0],isWeb);
-        }
-
-        public static void deleteTokenBasedMap(String tokenId,StringRedisTemplate template) {
-            template.delete(tokenId);
-        }
-    }
 
     private static final SecureRandom rnd = new SecureRandom();
 
@@ -166,8 +149,7 @@ public class AuthenticateCloudService extends TokenService {
         while(true) {
             authenticator = generateToken();
 
-             boolean hasSet = TokenMetaData.saveSerializedToken(authenticator,
-                     new TokenMetaData(playerId,isWeb), redisTemplate);
+             boolean hasSet = stringRedisTemplate.opsForValue().setIfAbsent(authenticator,playerId, Duration.ofDays(3));
              if(hasSet) {
                  break;
              }
@@ -183,10 +165,10 @@ public class AuthenticateCloudService extends TokenService {
 
         // 1 : first find if player id has already a used token for either web or unity
 
-         String tokensRaw = redisTemplate.opsForValue().get(playerId);
+         String tokensRaw = stringRedisTemplate.opsForValue().get(playerId);
 
          if(tokensRaw == null) {
-             redisTemplate.opsForValue().set(playerId,token);
+             stringRedisTemplate.opsForValue().set(playerId,token);
              return;
          }
 
@@ -195,14 +177,14 @@ public class AuthenticateCloudService extends TokenService {
          StringBuilder compositeKey = new StringBuilder(token + " ");
 
          for(String tokenId : tokensIds) {
-             String rawValue = redisTemplate.opsForValue().get(tokenId);
+             String rawValue = stringRedisTemplate.opsForValue().get(tokenId);
 
              TokenMetaData currentToken = TokenMetaData.deserialize(rawValue);
 
              if(currentToken == null) { continue;}
 
              if(currentToken.isWeb() == isWeb) {
-              TokenMetaData.deleteTokenBasedMap(tokenId, redisTemplate);
+              TokenMetaData.deleteTokenBasedMap(tokenId, stringRedisTemplate);
              }else {
                  compositeKey.append(tokenId);
              }
@@ -210,7 +192,7 @@ public class AuthenticateCloudService extends TokenService {
 
          }
 
-        redisTemplate.opsForValue().set(playerId,compositeKey.toString());
+        stringRedisTemplate.opsForValue().set(playerId,compositeKey.toString());
     }
 
 
