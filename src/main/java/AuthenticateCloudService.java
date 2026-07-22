@@ -16,7 +16,7 @@ public class AuthenticateCloudService extends TokenService {
 
     StringRedisTemplate stringRedisTemplate;
 
-    String luaCodeSplit = """
+  static   String luaCodeSplit = """
                local function split(val)
              
              local array = {}
@@ -56,7 +56,7 @@ public class AuthenticateCloudService extends TokenService {
              end
              """;
 
-           String luaCodeFind = luaCodeSplit + """
+        static    String luaCodeFind = luaCodeSplit + """
          
              
              
@@ -104,9 +104,9 @@ public class AuthenticateCloudService extends TokenService {
             add(isWeb);
         }};
 
-        RedisScript<String> script = RedisScript.of(luaCodeFind, String.class);
 
-        return stringRedisTemplate.execute(script, Collections.emptyList(),strings);
+
+        return stringRedisTemplate.execute(scriptFind, Collections.emptyList(),strings);
     }
 
 
@@ -152,12 +152,15 @@ public class AuthenticateCloudService extends TokenService {
              }
         }
 
+        List<String> strings = List.of(authenticator,isWeb+"",playerId);
+
+        stringRedisTemplate.execute(scriptAdd,Collections.emptyList(),strings);
         return authenticator;
     }
 
 
 
-    String addTokenInRedis = luaCodeSplit + """
+    static String addTokenInRedis = luaCodeSplit + """
             
             local function getTokenData(val) 
             
@@ -209,4 +212,6 @@ public class AuthenticateCloudService extends TokenService {
           
             """;
 
+    static RedisScript<String> scriptAdd = RedisScript.of(addTokenInRedis);
+    static RedisScript<String> scriptFind = RedisScript.of(luaCodeFind, String.class);
 }
