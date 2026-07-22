@@ -1,7 +1,6 @@
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.data.redis.core.stringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -17,9 +16,8 @@ public class AuthenticateCloudService extends TokenService {
 
     StringRedisTemplate stringRedisTemplate;
 
-
-    String luaCodeFind = """
-            local function split(val)
+    String luaCodeSplit = """
+               local function split(val)
              
              local array = {}
              
@@ -33,11 +31,6 @@ public class AuthenticateCloudService extends TokenService {
              
              if isWhiteSpace then
              
-              if i == length then
-             
-               return array
-             
-               end
                if i ~= currentStart  then 
                
                local sub = string.sub(val,currentStart,i-1)
@@ -45,8 +38,7 @@ public class AuthenticateCloudService extends TokenService {
                table.insert(array,sub)
                 
                end
-               
-                
+              
                currentStart = i+1 
               end
              
@@ -62,6 +54,10 @@ public class AuthenticateCloudService extends TokenService {
              return array
              
              end
+             """;
+
+           String luaCodeFind = luaCodeSplit + """
+         
              
              
             local tokenId = ARGV[1]
@@ -154,46 +150,18 @@ public class AuthenticateCloudService extends TokenService {
                  break;
              }
         }
-        addToken(authenticator,playerId,isWeb);
+
         return authenticator;
     }
 
 
 
-    private void addToken(String token,String playerId,boolean isWeb) {
+    String addTokenInRedis = """
+            
+            """;
 
 
-        // 1 : first find if player id has already a used token for either web or unity
 
-         String tokensRaw = stringRedisTemplate.opsForValue().get(playerId);
-
-         if(tokensRaw == null) {
-             stringRedisTemplate.opsForValue().set(playerId,token);
-             return;
-         }
-
-         String[] tokensIds = tokensRaw.split(" ");
-
-         StringBuilder compositeKey = new StringBuilder(token + " ");
-
-         for(String tokenId : tokensIds) {
-             String rawValue = stringRedisTemplate.opsForValue().get(tokenId);
-
-             TokenMetaData currentToken = TokenMetaData.deserialize(rawValue);
-
-             if(currentToken == null) { continue;}
-
-             if(currentToken.isWeb() == isWeb) {
-              TokenMetaData.deleteTokenBasedMap(tokenId, stringRedisTemplate);
-             }else {
-                 compositeKey.append(tokenId);
-             }
-
-
-         }
-
-        stringRedisTemplate.opsForValue().set(playerId,compositeKey.toString());
-    }
 
 
 
