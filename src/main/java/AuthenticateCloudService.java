@@ -56,15 +56,30 @@ public class AuthenticateCloudService extends TokenService {
              end
              """;
 
-        static    String luaCodeFind = luaCodeSplit + """
+
+    static final String luaSetBusyFlag = luaCodeSplit + """
+                 
+                 
+                 local function setFlag(isBusy,tokenId)
+                 
+                 local valueRaw = redis.call('GET',tokenId)
+                 
+                 local listValues = split(valueRaw)
+                 
+                 local newValue = listValues[1] .. " " .. listValues[2] .. " " .. isBusy
+                 
+                 redis.call('SET',tokenId,newValue,"KEEPTTL")
+                 
+                 end
+                 """;
+
+        static    String luaCodeFind =   luaSetBusyFlag + luaCodeSplit + """
          
-             
-             
             local tokenId = ARGV[1]
             
             local isWeb = ARGV[2]
             
-             local tokenValuesRaw = redis.call('GET',tokenId)
+            local tokenValuesRaw = redis.call('GET',tokenId)
              
             
              if tokenValuesRaw   then
@@ -75,8 +90,11 @@ public class AuthenticateCloudService extends TokenService {
             
             local isWebFromDb = arrayVal[2]
             
+            local isBusy = arrayVal[3]
             
-            if isWebFromDb == isWeb then 
+            if isWebFromDb == isWeb and  isBusy == "false" then 
+            
+            setFlag("true",tokenId)
             
             return arrayVal[1]
             
@@ -86,9 +104,7 @@ public class AuthenticateCloudService extends TokenService {
             
             
             return nil
-            
-            
-                   
+               
             """;
 
     public String findPlayerWithAuth(RequestDTO requestDTO) {
@@ -99,14 +115,11 @@ public class AuthenticateCloudService extends TokenService {
 
          String isWeb = requestCloudDto.isWeb + "";
 
-        List<String> strings = new ArrayList<>() {{
-            add(tokenId);
-            add(isWeb);
-        }};
 
 
 
-        return stringRedisTemplate.execute(scriptFind, Collections.emptyList(),strings);
+
+        return stringRedisTemplate.execute(scriptFind, Collections.emptyList(),tokenId,isWeb);
     }
 
 
@@ -145,7 +158,7 @@ public class AuthenticateCloudService extends TokenService {
         while(true) {
             authenticator = generateToken();
 
-            String tokenData = playerId + " " + requestCloudDto.isWeb;
+            String tokenData = playerId + " " + requestCloudDto.isWeb + " " + "true";
              boolean hasSet = stringRedisTemplate.opsForValue().setIfAbsent(authenticator,tokenData, Duration.ofDays(3));
              if(hasSet) {
                  break;
@@ -160,7 +173,7 @@ public class AuthenticateCloudService extends TokenService {
 
 
 
-    static String addTokenInRedis = luaCodeSplit + """
+    static final String addTokenInRedis = luaCodeSplit + """
             
             local function getTokenData(val) 
             
@@ -199,19 +212,36 @@ public class AuthenticateCloudService extends TokenService {
                 local tokenData =  split(tokenDataRaw)  
                
                 
-                   if tokenData[2] ~= source then
+                   if tokenData[2] ~= source   then
                    finalValue = finalValue .. " " .. listValue[i]
                    
-                   redis.call('SET',playerId,finalValue)
+                   else 
                    
-                   return 
+                   redis.call('DEL',listValue[i])
+                   
                    end
+                   
                 end
                 
+                
                end
+               
+               redis.call('SET',playerId,finalValue)
           
             """;
 
-    static RedisScript<String> scriptAdd = RedisScript.of(addTokenInRedis);
-    static RedisScript<String> scriptFind = RedisScript.of(luaCodeFind, String.class);
+
+    public void UnBusy(String tokenId) {
+        stringRedisTemplate.execute(scriptSetUnBusy,Collections.emptyList(),tokenId);
+    }
+
+   private final static String unBusy = luaSetBusyFlag + """
+           
+           local tokenId = ARGV[1]
+           
+           return setFlag("false",tokenId)
+           """;
+   private final static RedisScript<String> scriptSetUnBusy = RedisScript.of(unBusy,String.class);
+   private final  static RedisScript<String> scriptAdd = RedisScript.of(addTokenInRedis,String.class);
+   private final static RedisScript<String> scriptFind = RedisScript.of(luaCodeFind, String.class);
 }

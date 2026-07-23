@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BuyingService {
 
-    TokenCloudService tokenService;
+    TokenService tokenService;
 
     BuildingService buildingService;
 
@@ -20,13 +20,13 @@ public class BuyingService {
     @Transactional
     public Response buyInvestment(RequestDTO tokenRaw,String market,double amount) {
 
-        String token = tokenRaw.tokenId();
+        String playerId = tokenService.findPlayerWithAuth(tokenRaw);
 
-        String playerId = tokenService.findPlayerWithToken(token,tokenRaw.forWeb());
 
-        Player player = findingService.findPlayer(token);
 
-        entityManager.refresh(player, LockModeType.PESSIMISTIC_WRITE);
+        Player player = findingService.findPlayer(playerId);
+
+
 
         if (amount <= 0) {
             return new Response("invalid amount", new Status(400, "amount must be positive"));
@@ -62,11 +62,12 @@ public class BuyingService {
 
     @Transactional
     public Response buyBuilding(RequestDTO tokenRaw,String buildingId) {
-      String playerId = tokenService.findPlayerWithToken(tokenRaw.tokenId(), tokenRaw.forWeb());
+      String playerId = tokenService.findPlayerWithAuth(tokenRaw);
 
       Player player = findingService.findPlayer(playerId);
 
       Building building = buildingService.findBuilding(buildingId);
+
       double price = building.getPrice();
       if(price > player.getMoney()) {
         return new Response(false,new Status(401,"not enough money"));
