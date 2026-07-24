@@ -89,4 +89,13 @@ public class Player {
         return buildingProfiles;
     }
 
+    public List<InvestmentProfile> getAllInvestmentsProfiles() {
+        List<InvestmentProfile> investmentProfiles = new ArrayList<>();
+
+        for(Investment investment : investments) {
+            investmentProfiles.add(new InvestmentProfile(investment));
+        }
+        return  investmentProfiles;
+    }
+
 }
