@@ -9,6 +9,6 @@ public class PlayerProfile {
 
     public PlayerProfile(Player player) {
         this.buildingProfiles = player.getAllBuildingsProfile();
-
+        this.investmentProfiles = player.getAllInvestmentsProfiles();
     }
 }

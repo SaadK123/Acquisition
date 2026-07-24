@@ -1,1 +1,11 @@
-public record RequestDTO(String tokenId,boolean forWeb) {}
+public class RequestDTO {
+
+    public final String authenticatorId;
+    public RequestDTO(String authenticatorId) {
+        this.authenticatorId = authenticatorId;
+    }
+
+}
+
+
+

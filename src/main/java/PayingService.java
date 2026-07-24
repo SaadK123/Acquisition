@@ -8,15 +8,18 @@ public class PayingService {
 
     TokenService tokenService;
 
+    FindingService findingService;
      public PayingService(TokenService tokenService) {
         this.tokenService = tokenService;
      }
 
      public PlayerReport payPlayer(RequestDTO requestDTO) {
-        Token token =  tokenService.findPlayerWithToken(requestDTO);
-        Player player = token.getPlayerRaw();
 
-        var tuple = buildingReports(player.getBuildings());
+        String playerId = tokenService.findPlayerWithAuth(requestDTO);
+
+          Player player =  findingService.findPlayer(playerId);
+
+       var tuple = buildingReports(player.getBuildings());
 
         var investmentReports = investmentReports(player.getInvestments());
 
