@@ -12,12 +12,13 @@ public class ConnectionService {
 
     EntityManager entityManager;
     PasswordEncoder passwordEncoder;
-    TokenCloudService tokenService;
+    TokenService tokenService;
+
 
 
     @Transactional
     public Response connectingThroughJWT(RequestDTO requestDTO) {
-        String playerId  = tokenService.findPlayerWithToken(requestDTO.tokenId(), requestDTO.forWeb());
+        String playerId  = tokenService.findPlayerWithAuth(requestDTO);
 
         Player player = entityManager.createQuery("select Player p from Player  where p.id =: id",Player.class)
                 .setParameter("id",playerId).getSingleResult();
@@ -48,7 +49,7 @@ public class ConnectionService {
         HashMap<String,Object> container = new HashMap<>();
 
 
-        container.put("player",player.report());
+        container.put("player",player.get());
 
 
         Token token = new Token(player);

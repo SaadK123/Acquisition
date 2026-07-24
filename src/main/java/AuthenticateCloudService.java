@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,8 +12,7 @@ import java.util.List;
 public class AuthenticateCloudService extends TokenService {
 
 
-
-    StringRedisTemplate stringRedisTemplate;
+  StringRedisTemplate stringRedisTemplate;
 
   static   String luaCodeSplit = """
                local function split(val)
@@ -127,19 +125,7 @@ public class AuthenticateCloudService extends TokenService {
     private static final SecureRandom rnd = new SecureRandom();
 
 
-    private String generateToken() {
 
-        StringBuilder token = new StringBuilder();
-
-        for(int i = 0; i < 300; ++i) {
-           int randChar =  rnd.nextInt(33,127);
-
-           char c = (char) randChar;
-
-           token.append(c);
-        }
-        return token.toString();
-    }
 
 
     public String createAuthentication(RequestDTO requestDTO) {
@@ -231,7 +217,7 @@ public class AuthenticateCloudService extends TokenService {
             """;
 
 
-    public void UnBusy(String tokenId) {
+    public void UnSetFlag(String tokenId) {
         stringRedisTemplate.execute(scriptSetUnBusy,Collections.emptyList(),tokenId);
     }
 
